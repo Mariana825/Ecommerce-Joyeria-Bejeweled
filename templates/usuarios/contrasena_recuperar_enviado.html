@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block titulo %}Instrucciones enviadas | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<div class="panel panel-angosto centrado">
+    <h1>Revisa tu correo</h1>
+    <p class="subtitulo">Si el correo existe en nuestro sistema, te enviamos instrucciones para restablecer tu contraseña.</p>
+    <a href="{% url 'productos:inicio' %}" class="btn btn-contorno">Volver al inicio</a>
+</div>
+{% endblock %}

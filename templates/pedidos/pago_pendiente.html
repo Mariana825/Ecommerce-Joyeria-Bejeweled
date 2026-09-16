@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block titulo %}Pedido registrado | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<div class="panel panel-angosto centrado">
+    <div style="font-size:2.4rem;color:var(--gold);margin-bottom:8px;">◆</div>
+    <h1>¡Pedido registrado!</h1>
+    <p class="subtitulo">Tu pedido <strong>#{{ pedido.id }}</strong> se registró correctamente.</p>
+
+    <div class="resumen-total" style="justify-content:center;gap:16px;border-top:none;">
+        <span class="etiqueta-total">Total</span>
+        <span class="monto">${{ pedido.total|floatformat:2 }}</span>
+    </div>
+
+    <div class="aviso">
+        Este pedido está <strong>pendiente de pago</strong>. La integración con PayPal se agregará
+        en una próxima etapa del proyecto; por ahora el pedido queda registrado con sus productos
+        y su dirección de envío.
+    </div>
+
+    <a href="{% url 'pedidos:detalle' pedido.id %}" class="btn btn-primario">Ver detalle del pedido</a>
+    <div class="enlaces-form">
+        <p><a href="{% url 'productos:catalogo' %}">Seguir comprando</a></p>
+    </div>
+</div>
+{% endblock %}

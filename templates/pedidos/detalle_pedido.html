@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block titulo %}Pedido #{{ pedido.id }} | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<p class="migas">
+    <a href="{% url 'productos:inicio' %}">Inicio</a> ·
+    <a href="{% url 'usuarios:historial_pedidos' %}">Mis pedidos</a> ·
+    Pedido #{{ pedido.id }}
+</p>
+
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:32px;">
+    <h1 style="font-size:2rem;margin:0;">Pedido #{{ pedido.id }}</h1>
+    <span class="estado-pedido estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span>
+</div>
+
+<p style="font-size:0.82rem;color:var(--muted-foreground);">Realizado el {{ pedido.creado|date:"d/m/Y \a \l\a\s H:i" }}</p>
+
+<div class="layout-checkout" style="margin-top:32px;">
+    <div>
+        <h2 style="font-size:1.3rem;margin:0 0 16px;">Productos</h2>
+        <table class="tabla">
+            <thead>
+                <tr><th>Producto</th><th>Precio</th><th>Cant.</th><th>Subtotal</th></tr>
+            </thead>
+            <tbody>
+                {% for item in pedido.items.all %}
+                    <tr>
+                        <td>{{ item.nombre_producto }}</td>
+                        <td>${{ item.precio_unitario|floatformat:2 }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td class="precio">${{ item.subtotal|floatformat:2 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2 style="font-size:1.3rem;margin:40px 0 12px;">Dirección de envío</h2>
+        <div class="tarjeta-direccion">
+            <span class="etiqueta-nombre">{{ pedido.nombre_destinatario }}</span>
+            <div>{{ pedido.calle }} {{ pedido.numero }}{% if pedido.colonia %}, {{ pedido.colonia }}{% endif %}</div>
+            <div>{{ pedido.ciudad }}, {{ pedido.estado_direccion }}, CP {{ pedido.codigo_postal }}</div>
+            <div>{{ pedido.pais }}</div>
+            {% if pedido.telefono_contacto %}<div>Tel. {{ pedido.telefono_contacto }}</div>{% endif %}
+        </div>
+    </div>
+
+    <aside class="resumen-lateral">
+        <h3>Resumen</h3>
+        <div class="resumen-linea">
+            <span>Estado</span>
+            <span>{{ pedido.get_estado_display }}</span>
+        </div>
+        <div class="resumen-linea">
+            <span>Método de pago</span>
+            <span>{{ pedido.metodo_pago|default:"Por definir" }}</span>
+        </div>
+        <div class="resumen-total">
+            <span class="etiqueta-total">Total</span>
+            <span class="monto">${{ pedido.total|floatformat:2 }}</span>
+        </div>
+        <a href="{% url 'usuarios:historial_pedidos' %}" class="btn btn-contorno">Volver a mis pedidos</a>
+    </aside>
+</div>
+{% endblock %}

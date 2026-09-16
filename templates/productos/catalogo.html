@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block titulo %}Catálogo | Bejeweled{% endblock %}
+
+{% block contenido %}
+<div class="seccion-titulo">
+    <div class="seccion-eyebrow">
+        <div class="linea izq"></div>
+        <span>Nuestra tienda</span>
+        <div class="linea der"></div>
+    </div>
+    <h1>{% if q %}Resultados para «{{ q }}»{% else %}Catálogo{% endif %}</h1>
+    <p>Joyas finas seleccionadas pieza por pieza</p>
+</div>
+
+<div class="layout-catalogo">
+
+    {# ── Filtros ── #}
+    <aside class="filtros">
+        <form method="get">
+            {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+
+            <h3>Categorías</h3>
+            <ul class="lista-filtro">
+                <li><a href="?{% if q %}q={{ q }}{% endif %}" class="{% if not categoria_actual %}activo{% endif %}">Todas</a></li>
+                {% for cat in categorias %}
+                    <li>
+                        <a href="?{% if q %}q={{ q }}&{% endif %}categoria={{ cat.slug }}"
+                           class="{% if categoria_actual == cat.slug %}activo{% endif %}">{{ cat.nombre }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <h3>Material</h3>
+            <select name="material" onchange="this.form.submit()">
+                <option value="">Todos los materiales</option>
+                {% for mat in materiales %}
+                    <option value="{{ mat.id }}" {% if material_actual == mat.id|stringformat:"s" %}selected{% endif %}>{{ mat.nombre }}</option>
+                {% endfor %}
+            </select>
+
+            <h3>Precio</h3>
+            <div class="rango-precio">
+                <input type="number" name="precio_min" placeholder="Mín" value="{{ precio_min }}" min="0">
+                <input type="number" name="precio_max" placeholder="Máx" value="{{ precio_max }}" min="0">
+            </div>
+
+            <h3>Disponibilidad</h3>
+            <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;text-transform:none;letter-spacing:0;font-weight:400;color:var(--foreground);">
+                <input type="checkbox" name="disponibles" value="1" {% if solo_disponibles %}checked{% endif %}
+                       style="width:auto;accent-color:var(--primary);" onchange="this.form.submit()">
+                Solo productos en stock
+            </label>
+
+            <h3>Ordenar por</h3>
+            <select name="orden" onchange="this.form.submit()">
+                <option value="recientes" {% if orden_actual == 'recientes' %}selected{% endif %}>Más recientes</option>
+                <option value="precio_asc" {% if orden_actual == 'precio_asc' %}selected{% endif %}>Precio: menor a mayor</option>
+                <option value="precio_desc" {% if orden_actual == 'precio_desc' %}selected{% endif %}>Precio: mayor a menor</option>
+                <option value="nombre" {% if orden_actual == 'nombre' %}selected{% endif %}>Nombre (A–Z)</option>
+            </select>
+
+            <button type="submit" class="btn btn-contorno btn-pequeno">Aplicar filtros</button>
+            <p style="text-align:center;margin-top:14px;">
+                <a href="{% url 'productos:catalogo' %}" style="font-size:0.75rem;color:var(--muted-foreground);">Limpiar filtros</a>
+            </p>
+        </form>
+    </aside>
+
+    {# ── Resultados ── #}
+    <section>
+        <div class="barra-resultados">
+            <span>{{ total_resultados }} pieza{{ total_resultados|pluralize:"s" }} encontrada{{ total_resultados|pluralize:"s" }}</span>
+            {% if productos.paginator.num_pages > 1 %}
+                <span>Página {{ productos.number }} de {{ productos.paginator.num_pages }}</span>
+            {% endif %}
+        </div>
+
+        {% if productos %}
+            <div class="grid-productos">
+                {% for producto in productos %}
+                    {% include 'partials/tarjeta_producto.html' %}
+                {% endfor %}
+            </div>
+
+            {% if productos.has_other_pages %}
+                <div class="paginacion">
+                    {% if productos.has_previous %}
+                        <a href="?{{ query_string }}&pagina={{ productos.previous_page_number }}">← Anterior</a>
+                    {% endif %}
+                    <span>{{ productos.number }} / {{ productos.paginator.num_pages }}</span>
+                    {% if productos.has_next %}
+                        <a href="?{{ query_string }}&pagina={{ productos.next_page_number }}">Siguiente →</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="vacio">
+                <div class="icono">◆</div>
+                <h3 style="margin:0 0 8px;">No encontramos joyas con esos criterios</h3>
+                <p style="font-size:0.85rem;">Intenta ajustar los filtros o buscar con otras palabras.</p>
+                <a href="{% url 'productos:catalogo' %}" class="btn btn-contorno btn-pequeno" style="margin-top:20px;">Ver todo el catálogo</a>
+            </div>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

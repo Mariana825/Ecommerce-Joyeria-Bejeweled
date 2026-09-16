@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block titulo %}Confirmar pedido | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<div class="seccion-titulo">
+    <h1>Confirmar pedido</h1>
+</div>
+
+<div class="pasos-checkout">
+    <span class="paso">Carrito</span>
+    <span class="separador">—</span>
+    <span class="paso activo">Envío</span>
+    <span class="separador">—</span>
+    <span class="paso">Pago</span>
+</div>
+
+<div class="layout-checkout">
+
+    {# ── Dirección de envío ── #}
+    <div>
+        <h2 style="font-size:1.4rem;margin:0 0 20px;">Dirección de envío</h2>
+
+        {% if direcciones %}
+            <form method="post">
+                {% csrf_token %}
+                {% for direccion in direcciones %}
+                    <label class="opcion-direccion">
+                        <input type="radio" name="direccion_id" value="{{ direccion.id }}"
+                               {% if direccion.predeterminada %}checked{% endif %} required>
+                        <span>
+                            <strong>{{ direccion.etiqueta|default:"Dirección" }}</strong> — {{ direccion.destinatario }}<br>
+                            {{ direccion.calle }} {{ direccion.numero }}{% if direccion.colonia %}, {{ direccion.colonia }}{% endif %}<br>
+                            {{ direccion.ciudad }}, {{ direccion.estado }}, CP {{ direccion.codigo_postal }}, {{ direccion.pais }}
+                        </span>
+                    </label>
+                {% endfor %}
+
+                <p style="font-size:0.82rem;margin:16px 0 24px;">
+                    <a href="{% url 'usuarios:direccion_nueva' %}" style="color:var(--lilac-deep);font-weight:600;">+ Agregar otra dirección</a>
+                </p>
+
+                <div class="aviso">
+                    <strong>Sobre el pago:</strong> la integración con PayPal se agregará en la siguiente
+                    etapa del proyecto. Por ahora tu pedido quedará registrado como <em>pendiente de pago</em>,
+                    con sus productos y dirección de envío guardados.
+                </div>
+
+                <button type="submit" class="btn btn-oro" style="width:100%;">Confirmar pedido</button>
+            </form>
+        {% else %}
+            <div class="vacio">
+                <div class="icono">◆</div>
+                <h3 style="margin:0 0 8px;">No tienes direcciones guardadas</h3>
+                <p style="font-size:0.85rem;">Necesitamos una dirección para poder enviarte tu pedido.</p>
+                <a href="{% url 'usuarios:direccion_nueva' %}" class="btn btn-primario" style="margin-top:20px;">Agregar dirección</a>
+            </div>
+        {% endif %}
+    </div>
+
+    {# ── Resumen ── #}
+    <aside class="resumen-lateral">
+        <h3>Tu pedido</h3>
+        {% for item in carrito %}
+            <div class="resumen-linea">
+                <span>{{ item.cantidad }} × {{ item.producto.nombre|truncatechars:26 }}</span>
+                <span>${{ item.subtotal|floatformat:2 }}</span>
+            </div>
+        {% endfor %}
+        <div class="resumen-total">
+            <span class="etiqueta-total">Total</span>
+            <span class="monto">${{ carrito.total|floatformat:2 }}</span>
+        </div>
+        <p style="font-size:0.72rem;color:var(--muted-foreground);text-align:center;margin-top:16px;">
+            <a href="{% url 'carrito:ver_carrito' %}" style="color:var(--lilac-deep);">Editar carrito</a>
+        </p>
+    </aside>
+</div>
+{% endblock %}

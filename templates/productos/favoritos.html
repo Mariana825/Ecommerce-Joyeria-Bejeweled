@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block titulo %}Mis favoritos | Bejeweled{% endblock %}
+
+{% block contenido %}
+<div class="seccion-titulo">
+    <div class="seccion-eyebrow">
+        <div class="linea izq"></div>
+        <span>Tu lista de deseos</span>
+        <div class="linea der"></div>
+    </div>
+    <h1>Mis Favoritos</h1>
+    <p>Las piezas que guardaste para pensarlo con calma</p>
+</div>
+
+{% if favoritos %}
+    <div class="grid-productos">
+        {% for favorito in favoritos %}
+            {% with producto=favorito.producto %}
+                {% include 'partials/tarjeta_producto.html' %}
+            {% endwith %}
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="vacio">
+        <div class="icono">♡</div>
+        <h3 style="margin:0 0 8px;">Todavía no tienes favoritos</h3>
+        <p style="font-size:0.85rem;">Toca el corazón en cualquier joya para guardarla aquí.</p>
+        <a href="{% url 'productos:catalogo' %}" class="btn btn-contorno btn-pequeno" style="margin-top:20px;">Explorar el catálogo</a>
+    </div>
+{% endif %}
+{% endblock %}

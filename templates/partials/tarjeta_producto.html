@@ -1,0 +1,83 @@
+{% comment %}
+Tarjeta de producto reutilizable.
+Espera en el contexto:
+  - producto        : instancia de Producto
+  - favoritos_ids   : set con los IDs de productos favoritos del usuario
+{% endcomment %}
+<div class="tarjeta-producto">
+
+    <div class="imagen">
+        <a href="{{ producto.get_absolute_url }}">
+            {% if producto.imagen_principal %}
+                <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }}">
+            {% else %}
+                <img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=500&h=600&fit=crop&auto=format"
+                     alt="{{ producto.nombre }}">
+            {% endif %}
+        </a>
+
+        {% if not producto.disponible %}
+            <span class="etiqueta etiqueta-agotado">Agotado</span>
+        {% elif producto.es_nuevo %}
+            <span class="etiqueta etiqueta-nuevo">Nuevo</span>
+        {% elif producto.destacado %}
+            <span class="etiqueta etiqueta-destacado">Destacado</span>
+        {% endif %}
+
+        {% if producto.disponible %}
+            <div class="acciones-hover">
+                <form action="{% url 'carrito:agregar' producto.id %}" method="post" style="width:100%;">
+                    {% csrf_token %}
+                    <input type="hidden" name="cantidad" value="1">
+                    <button type="submit" class="btn btn-oro">Agregar al carrito</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="info">
+        <div class="fila-titulo">
+            <h3><a href="{{ producto.get_absolute_url }}">{{ producto.nombre }}</a></h3>
+
+            {% if user.is_authenticated %}
+                <form action="{% url 'productos:alternar_favorito' producto.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="siguiente" value="{{ request.get_full_path }}">
+                    <button type="submit" class="btn-corazon"
+                            aria-label="{% if producto.id in favoritos_ids %}Quitar de favoritos{% else %}Agregar a favoritos{% endif %}">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke-width="1.8"
+                             fill="{% if producto.id in favoritos_ids %}#C9A84C{% else %}none{% endif %}"
+                             stroke="{% if producto.id in favoritos_ids %}#C9A84C{% else %}#A8AAAD{% endif %}">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+                        </svg>
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+
+        <span class="material">
+            {% if producto.material %}{{ producto.material.nombre }}{% endif %}
+            {% if producto.material and producto.categoria %} · {% endif %}
+            {% if producto.categoria %}{{ producto.categoria.nombre }}{% endif %}
+        </span>
+
+        <div class="pie">
+            <span class="precio">${{ producto.precio|floatformat:2 }}</span>
+            {% if producto.total_resenas %}
+                <span class="contador-favoritos">
+                    <span class="estrellas" style="font-size:0.75rem;">★</span>
+                    {{ producto.calificacion_promedio }} ({{ producto.total_resenas }})
+                </span>
+            {% else %}
+                <span class="contador-favoritos">
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+                    </svg>
+                    {{ producto.total_favoritos }}
+                </span>
+            {% endif %}
+        </div>
+    </div>
+</div>

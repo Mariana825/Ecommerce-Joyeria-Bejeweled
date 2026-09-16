@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block titulo %}Crear cuenta | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<div class="panel panel-angosto">
+    <h1>Crear cuenta</h1>
+    <p class="subtitulo">Guarda tus favoritos, sigue tus pedidos y compra más rápido.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primario">Registrarme</button>
+    </form>
+    <div class="enlaces-form">
+        <p>¿Ya tienes cuenta? <a href="{% url 'usuarios:login' %}">Inicia sesión</a></p>
+    </div>
+</div>
+{% endblock %}

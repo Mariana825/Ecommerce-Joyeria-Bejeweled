@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% block titulo %}Bejeweled — Joyería Fina{% endblock %}
+
+{% block cuerpo %}
+
+{# ══════════ HERO ══════════ #}
+<section class="hero">
+    <div class="hero-fondo">
+        <img src="https://images.unsplash.com/photo-1558882268-15aa056d885f?w=1800&h=1100&fit=crop&auto=format"
+             alt="Mujer elegante portando joyería fina">
+    </div>
+
+    <div class="hero-lateral">
+        <div class="linea-vertical arriba"></div>
+        <span>FINE JEWELLERY</span>
+        <div class="linea-vertical abajo"></div>
+    </div>
+
+    <div class="hero-contenido">
+        <div class="contenedor">
+            <div class="hero-texto">
+                <h1>
+                    Encuentra la joya<br>
+                    perfecta para<br>
+                    <span class="destacado">cada momento</span>
+                </h1>
+                <p>Piezas únicas elaboradas con los metales y piedras preciosas más selectas del mundo. Exclusividad y calidad en cada detalle.</p>
+                <div class="hero-botones">
+                    <a href="{% url 'productos:colecciones' %}" class="btn btn-primario">Ver Colección</a>
+                    <a href="{% url 'productos:catalogo' %}" class="btn btn-claro">Explorar Catálogo</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="gold-divider"></div>
+
+{# ══════════ BANDA DE GARANTÍAS ══════════ #}
+<div class="banda-garantias">
+    <div class="contenedor">
+        <span><i class="rombo">◆</i> Certificación Internacional</span>
+        <span><i class="rombo">◆</i> Metales de Primera Calidad</span>
+        <span><i class="rombo">◆</i> Diseño Exclusivo</span>
+        <span><i class="rombo">◆</i> Garantía de por Vida</span>
+        <span><i class="rombo">◆</i> Envío Asegurado</span>
+    </div>
+</div>
+
+{# ══════════ CATEGORÍAS ══════════ #}
+<section class="seccion">
+    <div class="contenedor">
+        <div class="seccion-titulo">
+            <div class="seccion-eyebrow">
+                <div class="linea izq"></div>
+                <span>Explorar</span>
+                <div class="linea der"></div>
+            </div>
+            <h2>Categorías</h2>
+            <p>Descubre nuestra selección de joyas finas organizadas para ti</p>
+        </div>
+
+        {% if categorias %}
+            <div class="grid-categorias">
+                {% for categoria in categorias %}
+                    <a href="{% url 'productos:catalogo' %}?categoria={{ categoria.slug }}" class="tarjeta-categoria">
+                        {% if categoria.imagen %}
+                            <img src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}">
+                        {% else %}
+                            <img src="https://images.unsplash.com/photo-1588444650733-d0767b753fc8?w=600&h=700&fit=crop&auto=format"
+                                 alt="{{ categoria.nombre }}">
+                        {% endif %}
+                        <div class="info">
+                            <h3>{{ categoria.nombre }}</h3>
+                            <span>{{ categoria.productos.count }} pieza{{ categoria.productos.count|pluralize:"s" }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="vacio">
+                <div class="icono">◆</div>
+                <p>Aún no hay categorías registradas. Créalas desde el panel administrativo.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<div class="gold-divider estrecho"></div>
+
+{# ══════════ JOYAS DESTACADAS ══════════ #}
+<section class="seccion" style="background: var(--muted);">
+    <div class="contenedor">
+        <div class="seccion-titulo">
+            <h2>Joyas Destacadas</h2>
+            <p>Piezas seleccionadas por su excepcional diseño y calidad</p>
+        </div>
+
+        {% if destacados %}
+            <div class="grid-productos">
+                {% for producto in destacados %}
+                    {% include 'partials/tarjeta_producto.html' %}
+                {% endfor %}
+            </div>
+
+            <div style="text-align:center; margin-top:48px;">
+                <a href="{% url 'productos:catalogo' %}" class="btn btn-contorno">
+                    Ver Todos los Productos
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                    </svg>
+                </a>
+            </div>
+        {% else %}
+            <div class="vacio">
+                <div class="icono">◆</div>
+                <p>Todavía no hay productos en el catálogo.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+{# ══════════ COLECCIONES ══════════ #}
+{% if colecciones %}
+<section class="seccion">
+    <div class="contenedor">
+        <div class="seccion-titulo">
+            <h2>Nuestras Colecciones</h2>
+            <p>Cada colección cuenta una historia única de elegancia y artesanía</p>
+        </div>
+
+        <div class="grid-colecciones">
+            {% for coleccion in colecciones %}
+                <a href="{{ coleccion.get_absolute_url }}" class="tarjeta-coleccion">
+                    {% if coleccion.imagen %}
+                        <img src="{{ coleccion.imagen.url }}" alt="{{ coleccion.nombre }}">
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1611107683227-e9060eccd846?w=800&h=500&fit=crop&auto=format"
+                             alt="{{ coleccion.nombre }}">
+                    {% endif %}
+                    <div class="franja" style="background: {{ coleccion.color_acento }};"></div>
+                    <div class="info">
+                        <h3>{{ coleccion.nombre }}</h3>
+                        <p>{{ coleccion.descripcion|truncatewords:22 }}</p>
+                        <span class="explorar" style="color: {{ coleccion.color_acento }};">
+                            Explorar
+                            <svg class="flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                            </svg>
+                        </span>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{# ══════════ ASISTENTE IA ══════════ #}
+{% include 'partials/seccion_ia.html' %}
+
+{# ══════════ BENEFICIOS ══════════ #}
+{% include 'partials/beneficios.html' %}
+
+{% endblock %}

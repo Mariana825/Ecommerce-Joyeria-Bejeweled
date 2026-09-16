@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block titulo %}Colecciones | Bejeweled{% endblock %}
+
+{% block contenido %}
+<div class="seccion-titulo">
+    <div class="seccion-eyebrow">
+        <div class="linea izq"></div>
+        <span>Curadas a mano</span>
+        <div class="linea der"></div>
+    </div>
+    <h1>Nuestras Colecciones</h1>
+    <p>Cada colección cuenta una historia única de elegancia y artesanía</p>
+</div>
+
+{% if colecciones %}
+    <div class="grid-colecciones">
+        {% for coleccion in colecciones %}
+            <a href="{{ coleccion.get_absolute_url }}" class="tarjeta-coleccion">
+                {% if coleccion.imagen %}
+                    <img src="{{ coleccion.imagen.url }}" alt="{{ coleccion.nombre }}">
+                {% else %}
+                    <img src="https://images.unsplash.com/photo-1611107683227-e9060eccd846?w=800&h=500&fit=crop&auto=format" alt="{{ coleccion.nombre }}">
+                {% endif %}
+                <div class="franja" style="background: {{ coleccion.color_acento }};"></div>
+                <div class="info">
+                    <h3>{{ coleccion.nombre }}</h3>
+                    <p>{{ coleccion.descripcion|truncatewords:22 }}</p>
+                    <span class="explorar" style="color: {{ coleccion.color_acento }};">
+                        Explorar
+                        <svg class="flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+                        </svg>
+                    </span>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="vacio">
+        <div class="icono">◆</div>
+        <p>Aún no hay colecciones publicadas. Créalas desde el panel administrativo.</p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block titulo %}{{ producto.nombre }} | Bejeweled{% endblock %}
+
+{% block contenido %}
+
+<p class="migas">
+    <a href="{% url 'productos:inicio' %}">Inicio</a> ·
+    <a href="{% url 'productos:catalogo' %}">Catálogo</a>
+    {% if producto.categoria %}
+        · <a href="{% url 'productos:catalogo' %}?categoria={{ producto.categoria.slug }}">{{ producto.categoria.nombre }}</a>
+    {% endif %}
+</p>
+
+<div class="detalle-producto">
+
+    {# ── Galería ── #}
+    <div class="galeria">
+        {% if producto.imagen_principal %}
+            <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }}" class="imagen-principal">
+        {% else %}
+            <img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=800&h=1000&fit=crop&auto=format"
+                 alt="{{ producto.nombre }}" class="imagen-principal">
+        {% endif %}
+
+        {% if producto.imagenes.all %}
+            <div class="miniaturas">
+                {% if producto.imagen_principal %}
+                    <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }}">
+                {% endif %}
+                {% for img in producto.imagenes.all %}
+                    <img src="{{ img.imagen.url }}" alt="{{ producto.nombre }}">
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {# ── Información ── #}
+    <div class="info-producto">
+        <h1>{{ producto.nombre }}</h1>
+
+        {% if producto.total_resenas %}
+            <div class="resumen-calificacion">
+                <span class="estrellas">
+                    {% for _ in producto.estrellas_llenas %}★{% endfor %}{% for _ in producto.estrellas_vacias %}<span class="vacia">★</span>{% endfor %}
+                </span>
+                {{ producto.calificacion_promedio }} · {{ producto.total_resenas }} reseña{{ producto.total_resenas|pluralize:"s" }}
+            </div>
+        {% endif %}
+
+        <p class="precio-grande">${{ producto.precio|floatformat:2 }}</p>
+
+        {% if producto.disponible %}
+            <p class="disponibilidad en-stock">● Disponible — {{ producto.existencias }} en stock</p>
+        {% else %}
+            <p class="disponibilidad sin-stock">● Producto agotado</p>
+        {% endif %}
+
+        <div style="display:flex;gap:12px;align-items:center;margin-top:20px;">
+            {% if producto.disponible %}
+                <form action="{% url 'carrito:agregar' producto.id %}" method="post" class="form-agregar" style="flex:1;margin:0;">
+                    {% csrf_token %}
+                    <input type="number" name="cantidad" value="1" min="1" max="{{ producto.existencias }}">
+                    <button type="submit" class="btn btn-oro">Agregar al carrito</button>
+                </form>
+            {% else %}
+                <button class="btn btn-oro desactivado" disabled style="flex:1;">Agotado</button>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <form action="{% url 'productos:alternar_favorito' producto.id %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="siguiente" value="{{ request.get_full_path }}">
+                    <button type="submit" class="btn btn-contorno" style="padding:14px 18px;">
+                        <svg viewBox="0 0 24 24" width="18" height="18" stroke-width="1.8"
+                             fill="{% if producto.id in favoritos_ids %}#C9A84C{% else %}none{% endif %}"
+                             stroke="{% if producto.id in favoritos_ids %}#C9A84C{% else %}currentColor{% endif %}">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+                        </svg>
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+
+        <ul class="atributos">
+            {% if producto.categoria %}
+                <li><span class="etiqueta-attr">Categoría</span> <span>{{ producto.categoria.nombre }}</span></li>
+            {% endif %}
+            {% if producto.material %}
+                <li><span class="etiqueta-attr">Material</span> <span>{{ producto.material.nombre }}</span></li>
+            {% endif %}
+            {% if producto.coleccion %}
+                <li>
+                    <span class="etiqueta-attr">Colección</span>
+                    <span><a href="{{ producto.coleccion.get_absolute_url }}" style="color:var(--lilac-deep);">{{ producto.coleccion.nombre }}</a></span>
+                </li>
+            {% endif %}
+            <li><span class="etiqueta-attr">Disponibilidad</span> <span>{% if producto.disponible %}En stock{% else %}Agotado{% endif %}</span></li>
+        </ul>
+
+        {% if producto.descripcion %}
+            <h3 style="font-size:1.1rem;margin:28px 0 10px;">Descripción</h3>
+            <div class="descripcion-producto">{{ producto.descripcion|linebreaks }}</div>
+        {% endif %}
+    </div>
+</div>
+
+{# ══════════ RESEÑAS ══════════ #}
+<section style="margin-top:80px;">
+    <div class="gold-divider" style="margin-bottom:48px;"></div>
+
+    <h2 style="font-size:1.8rem;margin:0 0 8px;">Reseñas de clientes</h2>
+    <p style="font-size:0.85rem;color:var(--muted-foreground);font-weight:300;margin:0 0 32px;">
+        {% if producto.total_resenas %}
+            {{ producto.calificacion_promedio }} de 5 estrellas · basado en {{ producto.total_resenas }} reseña{{ producto.total_resenas|pluralize:"s" }}
+        {% else %}
+            Aún no hay reseñas de esta pieza. ¡Sé la primera persona en opinar!
+        {% endif %}
+    </p>
+
+    <div style="display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:start;">
+
+        {# Lista de reseñas #}
+        <div>
+            {% for resena in resenas %}
+                <div class="resena">
+                    <div class="resena-encabezado">
+                        <span class="resena-autor">{{ resena.usuario.first_name|default:resena.usuario.username }}</span>
+                        <span class="resena-fecha">{{ resena.creada|date:"d/m/Y" }}</span>
+                    </div>
+                    <span class="estrellas">
+                        {% for _ in resena.estrellas_llenas %}★{% endfor %}{% for _ in resena.estrellas_vacias %}<span class="vacia">★</span>{% endfor %}
+                    </span>
+                    <p>{{ resena.comentario }}</p>
+                </div>
+            {% empty %}
+                <p style="font-size:0.88rem;color:var(--muted-foreground);font-weight:300;">Todavía no hay reseñas publicadas.</p>
+            {% endfor %}
+        </div>
+
+        {# Formulario de reseña #}
+        <div class="panel">
+            {% if user.is_authenticated %}
+                {% if resena_propia %}
+                    <h3 style="font-size:1.2rem;margin:0 0 12px;">Tu reseña</h3>
+                    <span class="estrellas">
+                        {% for _ in resena_propia.estrellas_llenas %}★{% endfor %}{% for _ in resena_propia.estrellas_vacias %}<span class="vacia">★</span>{% endfor %}
+                    </span>
+                    <p style="font-size:0.85rem;line-height:1.8;font-weight:300;color:var(--muted-foreground);">{{ resena_propia.comentario }}</p>
+                    <p style="font-size:0.72rem;color:var(--muted-foreground);">Ya escribiste una reseña para esta pieza.</p>
+                {% else %}
+                    <h3 style="font-size:1.2rem;margin:0 0 20px;">Escribe una reseña</h3>
+                    <form action="{% url 'productos:crear_resena' producto.id %}" method="post">
+                        {% csrf_token %}
+                        {{ form_resena.as_p }}
+                        <button type="submit" class="btn btn-primario">Publicar reseña</button>
+                    </form>
+                {% endif %}
+            {% else %}
+                <h3 style="font-size:1.2rem;margin:0 0 12px;">¿Ya la compraste?</h3>
+                <p style="font-size:0.85rem;color:var(--muted-foreground);font-weight:300;line-height:1.8;">
+                    Inicia sesión para dejar tu calificación y ayudar a otras personas a elegir.
+                </p>
+                <a href="{% url 'usuarios:login' %}?next={{ request.path }}" class="btn btn-contorno" style="width:100%;">Iniciar sesión</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+{# ══════════ RELACIONADOS ══════════ #}
+{% if relacionados %}
+<section style="margin-top:80px;">
+    <div class="seccion-titulo">
+        <h2>También te puede gustar</h2>
+        <p>Piezas de la misma categoría</p>
+    </div>
+    <div class="grid-productos">
+        {% for producto in relacionados %}
+            {% include 'partials/tarjeta_producto.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block titulo %}Iniciar sesión | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<div class="panel panel-angosto">
+    <h1>Bienvenida de vuelta</h1>
+    <p class="subtitulo">Ingresa a tu cuenta para continuar con tu compra.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+        <button type="submit" class="btn btn-primario">Entrar</button>
+    </form>
+    <div class="enlaces-form">
+        <p><a href="{% url 'usuarios:password_reset' %}">¿Olvidaste tu contraseña?</a></p>
+        <p>¿No tienes cuenta? <a href="{% url 'usuarios:registro' %}">Regístrate</a></p>
+    </div>
+</div>
+{% endblock %}

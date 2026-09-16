@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block titulo %}Mi carrito | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<div class="seccion-titulo">
+    <h1>Mi carrito</h1>
+    <p>Revisa tus piezas antes de confirmar el pedido</p>
+</div>
+
+{% if carrito|length %}
+    <div class="layout-carrito">
+
+        <div>
+            <table class="tabla">
+                <thead>
+                    <tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th></th></tr>
+                </thead>
+                <tbody>
+                    {% for item in carrito %}
+                        <tr>
+                            <td>
+                                <div class="celda-producto">
+                                    {% if item.producto.imagen_principal %}
+                                        <img src="{{ item.producto.imagen_principal.url }}" alt="{{ item.producto.nombre }}">
+                                    {% else %}
+                                        <img src="https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=200&h=200&fit=crop&auto=format" alt="{{ item.producto.nombre }}">
+                                    {% endif %}
+                                    <div>
+                                        <a href="{{ item.producto.get_absolute_url }}" class="nombre">{{ item.producto.nombre }}</a>
+                                        {% if item.producto.material %}
+                                            <div class="material">{{ item.producto.material.nombre }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${{ item.precio|floatformat:2 }}</td>
+                            <td>
+                                <form action="{% url 'carrito:actualizar' item.producto.id %}" method="post" class="form-cantidad">
+                                    {% csrf_token %}
+                                    <input type="number" name="cantidad" value="{{ item.cantidad }}"
+                                           min="1" max="{{ item.producto.existencias }}" onchange="this.form.submit()">
+                                </form>
+                            </td>
+                            <td class="precio">${{ item.subtotal|floatformat:2 }}</td>
+                            <td>
+                                <form action="{% url 'carrito:eliminar' item.producto.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="link-boton">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div style="margin-top:28px;">
+                <a href="{% url 'productos:catalogo' %}" class="btn btn-contorno btn-pequeno">← Seguir comprando</a>
+            </div>
+        </div>
+
+        {# ── Resumen ── #}
+        <aside class="resumen-lateral">
+            <h3>Resumen</h3>
+            <div class="resumen-linea">
+                <span>Productos ({{ carrito|length }})</span>
+                <span>${{ carrito.total|floatformat:2 }}</span>
+            </div>
+            <div class="resumen-linea">
+                <span>Envío</span>
+                <span>Se calcula al confirmar</span>
+            </div>
+            <div class="resumen-total">
+                <span class="etiqueta-total">Total</span>
+                <span class="monto">${{ carrito.total|floatformat:2 }}</span>
+            </div>
+            <a href="{% url 'pedidos:checkout' %}" class="btn btn-oro">Proceder al pago</a>
+            <p style="font-size:0.7rem;color:var(--muted-foreground);text-align:center;margin-top:14px;line-height:1.6;">
+                Compra protegida · Certificado de autenticidad incluido
+            </p>
+        </aside>
+    </div>
+{% else %}
+    <div class="vacio">
+        <div class="icono">◆</div>
+        <h3 style="margin:0 0 8px;">Tu carrito está vacío</h3>
+        <p style="font-size:0.85rem;">Descubre nuestras piezas y encuentra la indicada.</p>
+        <a href="{% url 'productos:catalogo' %}" class="btn btn-primario" style="margin-top:20px;">Ver catálogo</a>
+    </div>
+{% endif %}
+{% endblock %}

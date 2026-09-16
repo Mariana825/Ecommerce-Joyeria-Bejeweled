@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block titulo %}Recuperar contraseña | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<div class="panel panel-angosto">
+    <h1>Recuperar contraseña</h1>
+    <p class="subtitulo">Ingresa tu correo y te enviaremos instrucciones para restablecerla.</p>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primario">Enviar instrucciones</button>
+    </form>
+    <div class="enlaces-form"><p><a href="{% url 'usuarios:login' %}">Volver a iniciar sesión</a></p></div>
+</div>
+{% endblock %}

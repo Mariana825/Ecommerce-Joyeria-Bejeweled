@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block titulo %}Nueva contraseña | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<div class="panel panel-angosto">
+    <h1>Elige una nueva contraseña</h1>
+    {% if validlink %}
+        <p class="subtitulo">Escríbela dos veces para confirmar.</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primario">Cambiar contraseña</button>
+        </form>
+    {% else %}
+        <p class="subtitulo">El enlace para restablecer la contraseña no es válido o ya expiró.</p>
+        <a href="{% url 'usuarios:password_reset' %}" class="btn btn-contorno">Solicitar uno nuevo</a>
+    {% endif %}
+</div>
+{% endblock %}

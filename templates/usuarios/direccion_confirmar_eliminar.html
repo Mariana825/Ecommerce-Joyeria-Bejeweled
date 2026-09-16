@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block titulo %}Eliminar dirección | Bejeweled{% endblock %}
+{% block newsletter %}{% endblock %}
+
+{% block contenido %}
+<div class="panel panel-angosto centrado">
+    <h1>¿Eliminar esta dirección?</h1>
+    <p class="subtitulo">
+        {{ direccion.destinatario }}<br>
+        {{ direccion.calle }} {{ direccion.numero }}, {{ direccion.ciudad }}
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-peligro">Sí, eliminar</button>
+    </form>
+    <div class="enlaces-form">
+        <p><a href="{% url 'usuarios:direcciones' %}">Cancelar</a></p>
+    </div>
+</div>
+{% endblock %}

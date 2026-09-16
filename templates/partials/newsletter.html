@@ -1,0 +1,12 @@
+<section class="seccion-newsletter">
+    <div class="contenedor">
+        <h2>Acceso Exclusivo</h2>
+        <p>Suscríbete para recibir primero nuestras nuevas colecciones, ofertas exclusivas y contenido sobre el mundo de la joyería fina.</p>
+        <form class="form-newsletter" action="{% url 'productos:newsletter' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="siguiente" value="{{ request.get_full_path }}">
+            <input type="email" name="email" placeholder="Tu correo electrónico" required>
+            <button type="submit" class="btn btn-primario">Suscribirse</button>
+        </form>
+    </div>
+</section>

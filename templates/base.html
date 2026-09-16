@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Bejeweled — Joyería Fina{% endblock %}</title>
+    <meta name="description" content="Joyería fina: anillos, collares, pulseras y aretes en oro, plata y piedras preciosas.">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+{% include 'partials/header.html' %}
+
+{% if messages %}
+    <div class="contenedor">
+        <ul class="mensajes">
+            {% for message in messages %}
+                <li class="mensaje mensaje-{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
+{% block cuerpo %}
+    <main class="contenedor seccion">
+        {% block contenido %}{% endblock %}
+    </main>
+{% endblock %}
+
+{% block newsletter %}
+    {% include 'partials/newsletter.html' %}
+{% endblock %}
+
+{% include 'partials/footer.html' %}
+
+<script>
+    // Menú móvil
+    document.getElementById('menu-movil-btn')?.addEventListener('click', function () {
+        document.getElementById('nav-movil')?.classList.toggle('abierto');
+    });
+
+    // Buscador desplegable del header
+    const btnBuscar = document.getElementById('btn-buscar');
+    const cajaBuscar = document.getElementById('caja-buscar');
+    btnBuscar?.addEventListener('click', function () {
+        cajaBuscar.style.display = 'block';
+        btnBuscar.style.display = 'none';
+        cajaBuscar.querySelector('input').focus();
+    });
+    cajaBuscar?.querySelector('input').addEventListener('blur', function () {
+        if (!this.value) {
+            cajaBuscar.style.display = 'none';
+            btnBuscar.style.display = 'flex';
+        }
+    });
+
+    // Galería del detalle de producto: cambiar imagen principal al hacer clic
+    document.querySelectorAll('.miniaturas img').forEach(function (mini) {
+        mini.addEventListener('click', function () {
+            const principal = document.querySelector('.galeria .imagen-principal');
+            if (principal) principal.src = this.src;
+        });
+    });
+</script>
+</body>
+</html>
