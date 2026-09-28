@@ -1,15 +1,28 @@
 {% extends 'base.html' %}
-{% block titulo %}Catálogo | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}
+    {{ "Catálogo | Bejeweled"|traducir:request }}
+{% endblock %}
 
 {% block contenido %}
+
 <div class="seccion-titulo">
     <div class="seccion-eyebrow">
         <div class="linea izq"></div>
-        <span>Nuestra tienda</span>
+        <span>{{ "Nuestra tienda"|traducir:request }}</span>
         <div class="linea der"></div>
     </div>
-    <h1>{% if q %}Resultados para «{{ q }}»{% else %}Catálogo{% endif %}</h1>
-    <p>Joyas finas seleccionadas pieza por pieza</p>
+
+    <h1>
+        {% if q %}
+            {{ "Resultados para"|traducir:request }} «{{ q }}»
+        {% else %}
+            {{ "Catálogo"|traducir:request }}
+        {% endif %}
+    </h1>
+
+    <p>{{ "Joyas finas seleccionadas pieza por pieza"|traducir:request }}</p>
 </div>
 
 <div class="layout-catalogo">
@@ -17,90 +30,212 @@
     {# ── Filtros ── #}
     <aside class="filtros">
         <form method="get">
-            {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
 
-            <h3>Categorías</h3>
+            {% if q %}
+                <input type="hidden" name="q" value="{{ q }}">
+            {% endif %}
+
+            <h3>{{ "Categorías"|traducir:request }}</h3>
+
             <ul class="lista-filtro">
-                <li><a href="?{% if q %}q={{ q }}{% endif %}" class="{% if not categoria_actual %}activo{% endif %}">Todas</a></li>
+                <li>
+                    <a href="?{% if q %}q={{ q }}{% endif %}"
+                       class="{% if not categoria_actual %}activo{% endif %}">
+                        {{ "Todas"|traducir:request }}
+                    </a>
+                </li>
+
                 {% for cat in categorias %}
                     <li>
                         <a href="?{% if q %}q={{ q }}&{% endif %}categoria={{ cat.slug }}"
-                           class="{% if categoria_actual == cat.slug %}activo{% endif %}">{{ cat.nombre }}</a>
+                           class="{% if categoria_actual == cat.slug %}activo{% endif %}">
+                            {{ cat.nombre|traducir:request }}
+                        </a>
                     </li>
                 {% endfor %}
             </ul>
 
-            <h3>Material</h3>
+            <h3>{{ "Material"|traducir:request }}</h3>
+
             <select name="material" onchange="this.form.submit()">
-                <option value="">Todos los materiales</option>
+                <option value="">
+                    {{ "Todos los materiales"|traducir:request }}
+                </option>
+
                 {% for mat in materiales %}
-                    <option value="{{ mat.id }}" {% if material_actual == mat.id|stringformat:"s" %}selected{% endif %}>{{ mat.nombre }}</option>
+                    <option value="{{ mat.id }}"
+                        {% if material_actual == mat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ mat.nombre|traducir:request }}
+                    </option>
                 {% endfor %}
             </select>
 
-            <h3>Precio</h3>
+            <h3>{{ "Precio"|traducir:request }}</h3>
+
             <div class="rango-precio">
-                <input type="number" name="precio_min" placeholder="Mín" value="{{ precio_min }}" min="0">
-                <input type="number" name="precio_max" placeholder="Máx" value="{{ precio_max }}" min="0">
+                <input
+                    type="number"
+                    name="precio_min"
+                    placeholder="{{ 'Mín'|traducir:request }}"
+                    value="{{ precio_min }}"
+                    min="0"
+                >
+
+                <input
+                    type="number"
+                    name="precio_max"
+                    placeholder="{{ 'Máx'|traducir:request }}"
+                    value="{{ precio_max }}"
+                    min="0"
+                >
             </div>
 
-            <h3>Disponibilidad</h3>
+            <h3>{{ "Disponibilidad"|traducir:request }}</h3>
+
             <label style="display:flex;align-items:center;gap:8px;font-size:0.82rem;text-transform:none;letter-spacing:0;font-weight:400;color:var(--foreground);">
-                <input type="checkbox" name="disponibles" value="1" {% if solo_disponibles %}checked{% endif %}
-                       style="width:auto;accent-color:var(--primary);" onchange="this.form.submit()">
-                Solo productos en stock
+                <input
+                    type="checkbox"
+                    name="disponibles"
+                    value="1"
+                    {% if solo_disponibles %}checked{% endif %}
+                    style="width:auto;accent-color:var(--primary);"
+                    onchange="this.form.submit()"
+                >
+
+                {{ "Solo productos en stock"|traducir:request }}
             </label>
 
-            <h3>Ordenar por</h3>
+            <h3>{{ "Ordenar por"|traducir:request }}</h3>
+
             <select name="orden" onchange="this.form.submit()">
-                <option value="recientes" {% if orden_actual == 'recientes' %}selected{% endif %}>Más recientes</option>
-                <option value="precio_asc" {% if orden_actual == 'precio_asc' %}selected{% endif %}>Precio: menor a mayor</option>
-                <option value="precio_desc" {% if orden_actual == 'precio_desc' %}selected{% endif %}>Precio: mayor a menor</option>
-                <option value="nombre" {% if orden_actual == 'nombre' %}selected{% endif %}>Nombre (A–Z)</option>
+
+                <option value="recientes"
+                    {% if orden_actual == 'recientes' %}selected{% endif %}>
+                    {{ "Más recientes"|traducir:request }}
+                </option>
+
+                <option value="precio_asc"
+                    {% if orden_actual == 'precio_asc' %}selected{% endif %}>
+                    {{ "Precio: menor a mayor"|traducir:request }}
+                </option>
+
+                <option value="precio_desc"
+                    {% if orden_actual == 'precio_desc' %}selected{% endif %}>
+                    {{ "Precio: mayor a menor"|traducir:request }}
+                </option>
+
+                <option value="nombre"
+                    {% if orden_actual == 'nombre' %}selected{% endif %}>
+                    {{ "Nombre (A–Z)"|traducir:request }}
+                </option>
+
             </select>
 
-            <button type="submit" class="btn btn-contorno btn-pequeno">Aplicar filtros</button>
+            <button type="submit" class="btn btn-contorno btn-pequeno">
+                {{ "Aplicar filtros"|traducir:request }}
+            </button>
+
             <p style="text-align:center;margin-top:14px;">
-                <a href="{% url 'productos:catalogo' %}" style="font-size:0.75rem;color:var(--muted-foreground);">Limpiar filtros</a>
+                <a
+                    href="{% url 'productos:catalogo' %}"
+                    style="font-size:0.75rem;color:var(--muted-foreground);"
+                >
+                    {{ "Limpiar filtros"|traducir:request }}
+                </a>
             </p>
+
         </form>
     </aside>
 
+
     {# ── Resultados ── #}
     <section>
+
         <div class="barra-resultados">
-            <span>{{ total_resultados }} pieza{{ total_resultados|pluralize:"s" }} encontrada{{ total_resultados|pluralize:"s" }}</span>
+
+            <span>
+                {{ total_resultados }}
+                {{ "pieza"|traducir:request }}{{ total_resultados|pluralize:"s" }}
+                {{ "encontrada"|traducir:request }}{{ total_resultados|pluralize:"s" }}
+            </span>
+
             {% if productos.paginator.num_pages > 1 %}
-                <span>Página {{ productos.number }} de {{ productos.paginator.num_pages }}</span>
+                <span>
+                    {{ "Página"|traducir:request }}
+                    {{ productos.number }}
+                    {{ "de"|traducir:request }}
+                    {{ productos.paginator.num_pages }}
+                </span>
             {% endif %}
+
         </div>
 
+
         {% if productos %}
+
             <div class="grid-productos">
+
                 {% for producto in productos %}
                     {% include 'partials/tarjeta_producto.html' %}
                 {% endfor %}
+
             </div>
 
+
             {% if productos.has_other_pages %}
+
                 <div class="paginacion">
+
                     {% if productos.has_previous %}
-                        <a href="?{{ query_string }}&pagina={{ productos.previous_page_number }}">← Anterior</a>
+                        <a href="?{{ query_string }}&pagina={{ productos.previous_page_number }}">
+                            ← {{ "Anterior"|traducir:request }}
+                        </a>
                     {% endif %}
-                    <span>{{ productos.number }} / {{ productos.paginator.num_pages }}</span>
+
+                    <span>
+                        {{ productos.number }} /
+                        {{ productos.paginator.num_pages }}
+                    </span>
+
                     {% if productos.has_next %}
-                        <a href="?{{ query_string }}&pagina={{ productos.next_page_number }}">Siguiente →</a>
+                        <a href="?{{ query_string }}&pagina={{ productos.next_page_number }}">
+                            {{ "Siguiente"|traducir:request }} →
+                        </a>
                     {% endif %}
+
                 </div>
+
             {% endif %}
+
+
         {% else %}
+
             <div class="vacio">
+
                 <div class="icono">◆</div>
-                <h3 style="margin:0 0 8px;">No encontramos joyas con esos criterios</h3>
-                <p style="font-size:0.85rem;">Intenta ajustar los filtros o buscar con otras palabras.</p>
-                <a href="{% url 'productos:catalogo' %}" class="btn btn-contorno btn-pequeno" style="margin-top:20px;">Ver todo el catálogo</a>
+
+                <h3 style="margin:0 0 8px;">
+                    {{ "No encontramos joyas con esos criterios"|traducir:request }}
+                </h3>
+
+                <p style="font-size:0.85rem;">
+                    {{ "Intenta ajustar los filtros o buscar con otras palabras."|traducir:request }}
+                </p>
+
+                <a
+                    href="{% url 'productos:catalogo' %}"
+                    class="btn btn-contorno btn-pequeno"
+                    style="margin-top:20px;"
+                >
+                    {{ "Ver todo el catálogo"|traducir:request }}
+                </a>
+
             </div>
+
         {% endif %}
+
     </section>
+
 </div>
+
 {% endblock %}

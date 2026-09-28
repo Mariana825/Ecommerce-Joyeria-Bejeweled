@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
-{% block titulo %}Mi perfil | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Mi perfil"|traducir:request }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <div class="panel panel-angosto">
-    <h1>Mi perfil</h1>
-    <p class="subtitulo">Actualiza tus datos personales.</p>
+    <h1>{{ "Mi perfil"|traducir:request }}</h1>
+    <p class="subtitulo">{{ "Actualiza tus datos personales."|traducir:request }}</p>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primario">Guardar cambios</button>
+        <button type="submit" class="btn btn-primario">{{ "Guardar cambios"|traducir:request }}</button>
     </form>
     <div class="enlaces-form">
         <p>
-            <a href="{% url 'usuarios:direcciones' %}">Mis direcciones</a> ·
-            <a href="{% url 'usuarios:historial_pedidos' %}">Mis pedidos</a>
+            <a href="{% url 'usuarios:direcciones' %}">{{ "Mis direcciones"|traducir:request }}</a> ·
+            <a href="{% url 'usuarios:historial_pedidos' %}">{{ "Mis pedidos"|traducir:request }}</a>
         </p>
     </div>
 </div>

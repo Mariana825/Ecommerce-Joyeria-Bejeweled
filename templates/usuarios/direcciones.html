@@ -1,31 +1,35 @@
 {% extends 'base.html' %}
-{% block titulo %}Mis direcciones | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Mis direcciones"|traducir:request }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <div class="seccion-titulo">
-    <h1>Mis direcciones de envío</h1>
-    <p>Guarda las direcciones que usas con más frecuencia</p>
+    <h1>{{ "Mis direcciones de envío"|traducir:request }}</h1>
+    <p>{{ "Guarda las direcciones que usas con más frecuencia"|traducir:request }}</p>
 </div>
 
 <div style="text-align:center;">
-    <a href="{% url 'usuarios:direccion_nueva' %}" class="btn btn-primario">+ Agregar dirección</a>
+    <a href="{% url 'usuarios:direccion_nueva' %}" class="btn btn-primario">{{ "+ Agregar dirección"|traducir:request }}</a>
 </div>
 
 {% if direcciones %}
     <div class="grid-tarjetas">
         {% for direccion in direcciones %}
             <div class="tarjeta-direccion">
-                {% if direccion.predeterminada %}<span class="badge-predeterminada">Predeterminada</span>{% endif %}
+                {% if direccion.predeterminada %}
+                    <span class="badge-predeterminada">{{ "Predeterminada"|traducir:request }}</span>
+                {% endif %}
                 <span class="etiqueta-nombre">{{ direccion.etiqueta|default:"Dirección" }}</span>
                 <div>{{ direccion.destinatario }}</div>
                 <div>{{ direccion.calle }} {{ direccion.numero }}{% if direccion.colonia %}, {{ direccion.colonia }}{% endif %}</div>
-                <div>{{ direccion.ciudad }}, {{ direccion.estado }}, CP {{ direccion.codigo_postal }}</div>
+                <div>{{ direccion.ciudad }}, {{ direccion.estado }}, {{ "CP"|traducir:request }} {{ direccion.codigo_postal }}</div>
                 <div>{{ direccion.pais }}</div>
-                {% if direccion.telefono_contacto %}<div>Tel. {{ direccion.telefono_contacto }}</div>{% endif %}
+                {% if direccion.telefono_contacto %}<div>{{ "Tel."|traducir:request }} {{ direccion.telefono_contacto }}</div>{% endif %}
                 <div class="acciones">
-                    <a href="{% url 'usuarios:direccion_editar' direccion.pk %}">Editar</a>
-                    <a href="{% url 'usuarios:direccion_eliminar' direccion.pk %}">Eliminar</a>
+                    <a href="{% url 'usuarios:direccion_editar' direccion.pk %}">{{ "Editar"|traducir:request }}</a>
+                    <a href="{% url 'usuarios:direccion_eliminar' direccion.pk %}">{{ "Eliminar"|traducir:request }}</a>
                 </div>
             </div>
         {% endfor %}
@@ -33,7 +37,7 @@
 {% else %}
     <div class="vacio">
         <div class="icono">◆</div>
-        <p>Aún no tienes direcciones guardadas.</p>
+        <p>{{ "Aún no tienes direcciones guardadas."|traducir:request }}</p>
     </div>
 {% endif %}
 {% endblock %}

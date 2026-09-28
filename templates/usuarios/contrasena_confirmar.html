@@ -1,20 +1,52 @@
 {% extends 'base.html' %}
-{% block titulo %}Nueva contraseña | Bejeweled{% endblock %}
-{% block newsletter %}{% endblock %}
+{% load traducir_tags %}
 
+{% block titulo %}
+    {{ "Nueva contraseña"|traducir:request }} | Bejeweled
+{% endblock %}
+{% block newsletter %}{% endblock %}
 {% block contenido %}
+
 <div class="panel panel-angosto">
-    <h1>Elige una nueva contraseña</h1>
+
+    <h1>
+        {{ "Elige una nueva contraseña"|traducir:request }}
+    </h1>
+
     {% if validlink %}
-        <p class="subtitulo">Escríbela dos veces para confirmar.</p>
+
+        <p class="subtitulo">
+            {{ "Escríbela dos veces para confirmar."|traducir:request }}
+        </p>
+
         <form method="post">
+
             {% csrf_token %}
+
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primario">Cambiar contraseña</button>
+
+            <button type="submit"
+                    class="btn btn-primario">
+
+                {{ "Cambiar contraseña"|traducir:request }}
+
+            </button>
+
         </form>
+
     {% else %}
-        <p class="subtitulo">El enlace para restablecer la contraseña no es válido o ya expiró.</p>
-        <a href="{% url 'usuarios:password_reset' %}" class="btn btn-contorno">Solicitar uno nuevo</a>
+
+        <p class="subtitulo">
+            {{ "El enlace para restablecer la contraseña no es válido o ya expiró."|traducir:request }}
+        </p>
+
+        <a href="{% url 'usuarios:password_reset' %}"
+           class="btn btn-contorno">
+
+            {{ "Solicitar uno nuevo"|traducir:request }}
+
+        </a>
     {% endif %}
+
 </div>
 {% endblock %}

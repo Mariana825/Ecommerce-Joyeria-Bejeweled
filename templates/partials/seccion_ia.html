@@ -1,31 +1,39 @@
+{% load traducir_tags %}
 {% comment %}
-Sección del asistente de ventas con IA.
-Por ahora es solo la interfaz: el chatbot se conectará en la siguiente
-etapa del proyecto, junto con PayPal y la traducción automática.
+Sección del asistente de ventas con IA. El botón abre el widget de chat
+flotante definido en base.html (ver #widget-chat y abrirChat() en el JS).
 {% endcomment %}
 <section class="seccion-ia">
     <div class="circulo-deco uno"></div>
     <div class="circulo-deco dos"></div>
 
     <div class="contenido">
-        <h2>¿No sabes qué<br><span class="destacado">joya elegir?</span></h2>
+        <h2>{{ "¿No sabes qué"|traducir:request }}<br><span class="destacado">{{ "joya elegir?"|traducir:request }}</span></h2>
 
-        <p>Nuestro asistente inteligente te ayudará a encontrar la joya perfecta según tu estilo, presupuesto y la ocasión especial que celebras.</p>
+        <p>{{ "Nuestro asistente inteligente te ayudará a encontrar la joya perfecta según tu estilo, presupuesto y la ocasión especial que celebras."|traducir:request }}</p>
 
         <div class="pastillas">
-            <span>Recomendación personalizada</span>
-            <span>Presupuesto adaptable</span>
-            <span>Para cualquier ocasión</span>
-            <span>Disponible 24/7</span>
+            <span>{{ "Recomendación personalizada"|traducir:request }}</span>
+            <span>{{ "Presupuesto adaptable"|traducir:request }}</span>
+            <span>{{ "Para cualquier ocasión"|traducir:request }}</span>
+            <span>{{ "Disponible 24/7"|traducir:request }}</span>
         </div>
 
-        <button type="button" class="btn btn-oro desactivado" disabled>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
-            </svg>
-            Hablar con el Asistente
-        </button>
-
-        <p class="nota-proximamente">Próximamente — el chatbot con IA se integrará en la siguiente etapa del proyecto.</p>
+        {% if chatbot_configurado %}
+            <button type="button" class="btn btn-oro" onclick="abrirChat()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                </svg>
+                {{ "Hablar con el Asistente"|traducir:request }}
+            </button>
+        {% else %}
+            <button type="button" class="btn btn-oro desactivado" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/>
+                </svg>
+                {{ "Hablar con el Asistente"|traducir:request }}
+            </button>
+            <p class="nota-proximamente">{{ "El asistente todavía no está configurado en este servidor (falta GEMINI_API_KEY en el archivo .env)."|traducir:request }}</p>
+        {% endif %}
     </div>
 </section>

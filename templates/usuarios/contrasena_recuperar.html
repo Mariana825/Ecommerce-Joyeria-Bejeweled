@@ -1,16 +1,20 @@
 {% extends 'base.html' %}
-{% block titulo %}Recuperar contraseña | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Recuperar contraseña"|traducir:request }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <div class="panel panel-angosto">
-    <h1>Recuperar contraseña</h1>
-    <p class="subtitulo">Ingresa tu correo y te enviaremos instrucciones para restablecerla.</p>
+    <h1>{{ "Recuperar contraseña"|traducir:request }}</h1>
+    <p class="subtitulo">{{ "Ingresa tu correo y te enviaremos instrucciones para restablecerla."|traducir:request }}</p>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primario">Enviar instrucciones</button>
+        <button type="submit" class="btn btn-primario">{{ "Enviar instrucciones"|traducir:request }}</button>
     </form>
-    <div class="enlaces-form"><p><a href="{% url 'usuarios:login' %}">Volver a iniciar sesión</a></p></div>
+    <div class="enlaces-form">
+        <p><a href="{% url 'usuarios:login' %}">{{ "Volver a iniciar sesión"|traducir:request }}</a></p>
+    </div>
 </div>
 {% endblock %}

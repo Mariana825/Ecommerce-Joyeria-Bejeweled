@@ -1,18 +1,20 @@
 {% extends 'base.html' %}
-{% block titulo %}{{ titulo }} | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ titulo|traducir:request }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <div class="panel panel-angosto">
-    <h1>{{ titulo }}</h1>
-    <p class="subtitulo">Necesitamos estos datos para enviarte tu pedido.</p>
+    <h1>{{ titulo|traducir:request }}</h1>
+    <p class="subtitulo">{{ "Necesitamos estos datos para enviarte tu pedido."|traducir:request }}</p>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primario">Guardar dirección</button>
+        <button type="submit" class="btn btn-primario">{{ "Guardar dirección"|traducir:request }}</button>
     </form>
     <div class="enlaces-form">
-        <p><a href="{% url 'usuarios:direcciones' %}">Volver a mis direcciones</a></p>
+        <p><a href="{% url 'usuarios:direcciones' %}">{{ "Volver a mis direcciones"|traducir:request }}</a></p>
     </div>
 </div>
 {% endblock %}

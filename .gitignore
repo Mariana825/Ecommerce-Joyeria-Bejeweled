@@ -6,3 +6,9 @@ media/productos/*
 .venv/
 venv/
 *.log
+.env
+
+
+# Certificados HTTPS de desarrollo
+cert.key
+cert.crt

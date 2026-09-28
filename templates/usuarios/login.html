@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
-{% block titulo %}Iniciar sesión | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Iniciar sesión"|traducir:request }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <div class="panel panel-angosto">
-    <h1>Bienvenida de vuelta</h1>
-    <p class="subtitulo">Ingresa a tu cuenta para continuar con tu compra.</p>
+    <h1>{{ "Bienvenida de vuelta"|traducir:request }}</h1>
+    <p class="subtitulo">{{ "Ingresa a tu cuenta para continuar con tu compra."|traducir:request }}</p>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
-        <button type="submit" class="btn btn-primario">Entrar</button>
+        <button type="submit" class="btn btn-primario">{{ "Entrar"|traducir:request }}</button>
     </form>
     <div class="enlaces-form">
-        <p><a href="{% url 'usuarios:password_reset' %}">¿Olvidaste tu contraseña?</a></p>
-        <p>¿No tienes cuenta? <a href="{% url 'usuarios:registro' %}">Regístrate</a></p>
+        <p><a href="{% url 'usuarios:password_reset' %}">{{ "¿Olvidaste tu contraseña?"|traducir:request }}</a></p>
+        <p>{{ "¿No tienes cuenta?"|traducir:request }} <a href="{% url 'usuarios:registro' %}">{{ "Regístrate"|traducir:request }}</a></p>
     </div>
 </div>
 {% endblock %}

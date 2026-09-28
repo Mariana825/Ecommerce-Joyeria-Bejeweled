@@ -1,0 +1,147 @@
+{% load traducir_tags %}
+{% comment %}
+Widget de chat flotante. Solo se incluye cuando settings.CHATBOT_CONFIGURADO
+es verdadero (ver base.html). Habla con /chatbot/mensaje/ y /chatbot/historial/.
+{% endcomment %}
+
+<button type="button" id="burbuja-chat" class="burbuja-chat" aria-label="{{ "Abrir chat de ayuda"|traducir:request }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="24" height="24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/>
+    </svg>
+</button>
+
+<div id="panel-chat" class="panel-chat">
+    <div class="chat-encabezado">
+        <div>
+            <strong>{{ "Asistente Bejeweled"|traducir:request }}</strong>
+            <span class="chat-estado">● {{ "En línea"|traducir:request }}</span>
+        </div>
+        <button type="button" id="cerrar-chat" class="icono-btn" aria-label="{{ "Cerrar chat"|traducir:request }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+
+    <div id="chat-mensajes" class="chat-mensajes">
+        <div class="chat-burbuja chat-burbuja-bot">
+            {{ "¡Hola! Soy el asistente de Bejeweled. Puedo ayudarte con dudas sobre categorías, materiales, envíos, devoluciones o cómo comprar. ¿En qué te ayudo?"|traducir:request }}
+        </div>
+    </div>
+
+    <form id="form-chat" class="chat-formulario">
+        {% csrf_token %}
+        <input type="text" id="chat-input" name="mensaje" autocomplete="off"
+               placeholder="{{ "Escribe tu pregunta..."|traducir:request }}" maxlength="1000">
+        <button type="submit" class="icono-btn" aria-label="{{ "Enviar"|traducir:request }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
+            </svg>
+        </button>
+    </form>
+</div>
+
+<script>
+(function () {
+    const burbuja = document.getElementById('burbuja-chat');
+    const panel = document.getElementById('panel-chat');
+    const cerrar = document.getElementById('cerrar-chat');
+    const lista = document.getElementById('chat-mensajes');
+    const form = document.getElementById('form-chat');
+    const input = document.getElementById('chat-input');
+    const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    let historialCargado = false;
+
+    function escaparHtml(texto) {
+        const div = document.createElement('div');
+        div.textContent = texto;
+        return div.innerHTML;
+    }
+
+    function agregarBurbuja(texto, esUsuario) {
+        const burbujaMsg = document.createElement('div');
+        burbujaMsg.className = 'chat-burbuja ' + (esUsuario ? 'chat-burbuja-usuario' : 'chat-burbuja-bot');
+        burbujaMsg.innerHTML = escaparHtml(texto).replace(/\n/g, '<br>');
+        lista.appendChild(burbujaMsg);
+        lista.scrollTop = lista.scrollHeight;
+        return burbujaMsg;
+    }
+
+    function mostrarEscribiendo() {
+        const indicador = document.createElement('div');
+        indicador.className = 'chat-burbuja chat-burbuja-bot chat-escribiendo';
+        indicador.id = 'chat-escribiendo';
+        indicador.innerHTML = '<span></span><span></span><span></span>';
+        lista.appendChild(indicador);
+        lista.scrollTop = lista.scrollHeight;
+    }
+
+    function quitarEscribiendo() {
+        document.getElementById('chat-escribiendo')?.remove();
+    }
+
+    window.abrirChat = function () {
+        panel.classList.add('abierto');
+        burbuja.classList.add('oculta');
+        input.focus();
+
+        if (!historialCargado) {
+            historialCargado = true;
+            fetch("{% url 'chatbot:historial' %}")
+                .then(function (res) { return res.json(); })
+                .then(function (datos) {
+                    (datos.mensajes || []).forEach(function (m) {
+                        agregarBurbuja(m.contenido, m.rol === 'user');
+                    });
+                })
+                .catch(function () { /* si falla, el saludo inicial ya está en pantalla */ });
+        }
+    };
+
+    function cerrarChat() {
+        panel.classList.remove('abierto');
+        burbuja.classList.remove('oculta');
+    }
+
+    burbuja.addEventListener('click', window.abrirChat);
+    cerrar.addEventListener('click', cerrarChat);
+
+    form.addEventListener('submit', function (evento) {
+        evento.preventDefault();
+        const texto = input.value.trim();
+        if (!texto) return;
+
+        agregarBurbuja(texto, true);
+        input.value = '';
+        input.disabled = true;
+        mostrarEscribiendo();
+
+        fetch("{% url 'chatbot:enviar_mensaje' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+            },
+            body: JSON.stringify({ mensaje: texto }),
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (datos) {
+            quitarEscribiendo();
+            if (datos.error) {
+                agregarBurbuja('{{ "Ocurrió un error. Intenta de nuevo."|traducir:request|escapejs }}', false);
+            } else {
+                agregarBurbuja(datos.respuesta, false);
+            }
+        })
+        .catch(function () {
+            quitarEscribiendo();
+            agregarBurbuja('{{ "No pude conectarme. Revisa tu conexión e intenta de nuevo."|traducir:request|escapejs }}', false);
+        })
+        .finally(function () {
+            input.disabled = false;
+            input.focus();
+        });
+    });
+})();
+</script>

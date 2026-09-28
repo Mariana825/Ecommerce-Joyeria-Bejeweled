@@ -1,3 +1,4 @@
+{% load traducir_tags %}
 {% comment %}
 Tarjeta de producto reutilizable.
 Espera en el contexto:
@@ -17,11 +18,11 @@ Espera en el contexto:
         </a>
 
         {% if not producto.disponible %}
-            <span class="etiqueta etiqueta-agotado">Agotado</span>
+            <span class="etiqueta etiqueta-agotado">{{ "Agotado"|traducir:request }}</span>
         {% elif producto.es_nuevo %}
-            <span class="etiqueta etiqueta-nuevo">Nuevo</span>
+            <span class="etiqueta etiqueta-nuevo">{{ "Nuevo"|traducir:request }}</span>
         {% elif producto.destacado %}
-            <span class="etiqueta etiqueta-destacado">Destacado</span>
+            <span class="etiqueta etiqueta-destacado">{{ "Destacado"|traducir:request }}</span>
         {% endif %}
 
         {% if producto.disponible %}
@@ -29,7 +30,7 @@ Espera en el contexto:
                 <form action="{% url 'carrito:agregar' producto.id %}" method="post" style="width:100%;">
                     {% csrf_token %}
                     <input type="hidden" name="cantidad" value="1">
-                    <button type="submit" class="btn btn-oro">Agregar al carrito</button>
+                    <button type="submit" class="btn btn-oro">{{ "Agregar al carrito"|traducir:request }}</button>
                 </form>
             </div>
         {% endif %}
@@ -37,7 +38,7 @@ Espera en el contexto:
 
     <div class="info">
         <div class="fila-titulo">
-            <h3><a href="{{ producto.get_absolute_url }}">{{ producto.nombre }}</a></h3>
+            <h3><a href="{{ producto.get_absolute_url }}">{{ producto.nombre|traducir:request }}</a></h3>
 
             {% if user.is_authenticated %}
                 <form action="{% url 'productos:alternar_favorito' producto.id %}" method="post">
@@ -57,9 +58,9 @@ Espera en el contexto:
         </div>
 
         <span class="material">
-            {% if producto.material %}{{ producto.material.nombre }}{% endif %}
+            {% if producto.material %}{{ producto.material.nombre|traducir:request }}{% endif %}
             {% if producto.material and producto.categoria %} · {% endif %}
-            {% if producto.categoria %}{{ producto.categoria.nombre }}{% endif %}
+            {% if producto.categoria %}{{ producto.categoria.nombre|traducir:request }}{% endif %}
         </span>
 
         <div class="pie">

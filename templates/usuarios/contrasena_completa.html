@@ -1,11 +1,26 @@
 {% extends 'base.html' %}
-{% block titulo %}Contraseña actualizada | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}
+    {{ "Contraseña actualizada"|traducir:request }} | Bejeweled
+{% endblock %}
+
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <div class="panel panel-angosto centrado">
-    <h1>¡Listo!</h1>
-    <p class="subtitulo">Tu contraseña se actualizó correctamente.</p>
-    <a href="{% url 'usuarios:login' %}" class="btn btn-primario">Iniciar sesión</a>
+    <h1>
+        {{ "¡Listo!"|traducir:request }}
+    </h1>
+    <p class="subtitulo">
+        {{ "Tu contraseña se actualizó correctamente."|traducir:request }}
+    </p>
+
+    <a href="{% url 'usuarios:login' %}"
+       class="btn btn-primario">
+
+        {{ "Iniciar sesión"|traducir:request }}
+    </a>
+
 </div>
 {% endblock %}

@@ -1,79 +1,138 @@
 {% extends 'base.html' %}
-{% block titulo %}Confirmar pedido | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Confirmar pedido"|traducir:request }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <div class="seccion-titulo">
-    <h1>Confirmar pedido</h1>
+    <h1>{{ "Confirmar pedido"|traducir:request }}</h1>
 </div>
 
 <div class="pasos-checkout">
-    <span class="paso">Carrito</span>
+    <span class="paso">{{ "Carrito"|traducir:request }}</span>
     <span class="separador">—</span>
-    <span class="paso activo">Envío</span>
+    <span class="paso activo">{{ "Envío"|traducir:request }}</span>
     <span class="separador">—</span>
-    <span class="paso">Pago</span>
+    <span class="paso">{{ "Pago"|traducir:request }}</span>
 </div>
 
 <div class="layout-checkout">
 
     {# ── Dirección de envío ── #}
     <div>
-        <h2 style="font-size:1.4rem;margin:0 0 20px;">Dirección de envío</h2>
+        <h2 style="font-size:1.4rem;margin:0 0 20px;">
+            {{ "Dirección de envío"|traducir:request }}
+        </h2>
 
         {% if direcciones %}
             <form method="post">
                 {% csrf_token %}
+
                 {% for direccion in direcciones %}
                     <label class="opcion-direccion">
-                        <input type="radio" name="direccion_id" value="{{ direccion.id }}"
-                               {% if direccion.predeterminada %}checked{% endif %} required>
+                        <input type="radio"
+                               name="direccion_id"
+                               value="{{ direccion.id }}"
+                               {% if direccion.predeterminada %}checked{% endif %}
+                               required>
+
                         <span>
-                            <strong>{{ direccion.etiqueta|default:"Dirección" }}</strong> — {{ direccion.destinatario }}<br>
-                            {{ direccion.calle }} {{ direccion.numero }}{% if direccion.colonia %}, {{ direccion.colonia }}{% endif %}<br>
-                            {{ direccion.ciudad }}, {{ direccion.estado }}, CP {{ direccion.codigo_postal }}, {{ direccion.pais }}
+                            <strong>
+                                {{ direccion.etiqueta|default:"Dirección"|traducir:request }}
+                            </strong>
+                            — {{ direccion.destinatario }}<br>
+
+                            {{ direccion.calle }} {{ direccion.numero }}
+                            {% if direccion.colonia %}, {{ direccion.colonia }}{% endif %}<br>
+
+                            {{ direccion.ciudad }},
+                            {{ direccion.estado }},
+                            {{ "CP"|traducir:request }} {{ direccion.codigo_postal }},
+                            {{ direccion.pais }}
                         </span>
                     </label>
                 {% endfor %}
 
                 <p style="font-size:0.82rem;margin:16px 0 24px;">
-                    <a href="{% url 'usuarios:direccion_nueva' %}" style="color:var(--lilac-deep);font-weight:600;">+ Agregar otra dirección</a>
+                    <a href="{% url 'usuarios:direccion_nueva' %}"
+                       style="color:var(--lilac-deep);font-weight:600;">
+                        {{ "+ Agregar otra dirección"|traducir:request }}
+                    </a>
                 </p>
 
                 <div class="aviso">
-                    <strong>Sobre el pago:</strong> la integración con PayPal se agregará en la siguiente
-                    etapa del proyecto. Por ahora tu pedido quedará registrado como <em>pendiente de pago</em>,
-                    con sus productos y dirección de envío guardados.
+                    <strong>{{ "Sobre el pago:"|traducir:request }}</strong>
+                    {{ "en el siguiente paso podrás pagar con PayPal"|traducir:request }}
+                    ({{ "entorno de pruebas / sandbox — no se realiza ningún cobro real"|traducir:request }}).
+                    {{ "Tu pedido se registra primero como"|traducir:request }}
+                    <em>{{ "pendiente de pago"|traducir:request }}</em>.
                 </div>
 
-                <button type="submit" class="btn btn-oro" style="width:100%;">Confirmar pedido</button>
+                <button type="submit"
+                        class="btn btn-oro"
+                        style="width:100%;">
+                    {{ "Confirmar pedido"|traducir:request }}
+                </button>
             </form>
+
         {% else %}
+
             <div class="vacio">
                 <div class="icono">◆</div>
-                <h3 style="margin:0 0 8px;">No tienes direcciones guardadas</h3>
-                <p style="font-size:0.85rem;">Necesitamos una dirección para poder enviarte tu pedido.</p>
-                <a href="{% url 'usuarios:direccion_nueva' %}" class="btn btn-primario" style="margin-top:20px;">Agregar dirección</a>
+
+                <h3 style="margin:0 0 8px;">
+                    {{ "No tienes direcciones guardadas"|traducir:request }}
+                </h3>
+
+                <p style="font-size:0.85rem;">
+                    {{ "Necesitamos una dirección para poder enviarte tu pedido."|traducir:request }}
+                </p>
+
+                <a href="{% url 'usuarios:direccion_nueva' %}"
+                   class="btn btn-primario"
+                   style="margin-top:20px;">
+                    {{ "Agregar dirección"|traducir:request }}
+                </a>
             </div>
+
         {% endif %}
     </div>
 
     {# ── Resumen ── #}
     <aside class="resumen-lateral">
-        <h3>Tu pedido</h3>
+        <h3>{{ "Tu pedido"|traducir:request }}</h3>
+
         {% for item in carrito %}
             <div class="resumen-linea">
-                <span>{{ item.cantidad }} × {{ item.producto.nombre|truncatechars:26 }}</span>
-                <span>${{ item.subtotal|floatformat:2 }}</span>
+                <span>
+                    {{ item.cantidad }} ×
+                    {{ item.producto.nombre|traducir:request|truncatechars:26 }}
+                </span>
+
+                <span>
+                    ${{ item.subtotal|floatformat:2 }}
+                </span>
             </div>
         {% endfor %}
+
         <div class="resumen-total">
-            <span class="etiqueta-total">Total</span>
-            <span class="monto">${{ carrito.total|floatformat:2 }}</span>
+            <span class="etiqueta-total">
+                {{ "Total"|traducir:request }}
+            </span>
+
+            <span class="monto">
+                ${{ carrito.total|floatformat:2 }}
+            </span>
         </div>
+
         <p style="font-size:0.72rem;color:var(--muted-foreground);text-align:center;margin-top:16px;">
-            <a href="{% url 'carrito:ver_carrito' %}" style="color:var(--lilac-deep);">Editar carrito</a>
+            <a href="{% url 'carrito:ver_carrito' %}"
+               style="color:var(--lilac-deep);">
+                {{ "Editar carrito"|traducir:request }}
+            </a>
         </p>
     </aside>
+
 </div>
 {% endblock %}

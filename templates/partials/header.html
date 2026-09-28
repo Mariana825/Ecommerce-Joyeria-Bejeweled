@@ -1,4 +1,6 @@
+{% load traducir_tags %}
 {% load static %}
+
 <header class="site-header">
     <div class="contenedor header-inner">
 
@@ -14,37 +16,53 @@
 
         {# ── Navegación ── #}
         <nav class="nav-principal">
-            <a href="{% url 'productos:inicio' %}">Inicio</a>
-            <a href="{% url 'productos:catalogo' %}">Catálogo</a>
-            <a href="{% url 'productos:colecciones' %}">Colecciones</a>
-            <a href="{% url 'productos:catalogo' %}?orden=recientes">Novedades</a>
+            <a href="{% url 'productos:inicio' %}">{{ "Inicio"|traducir:request }}</a>
+            <a href="{% url 'productos:catalogo' %}">{{ "Catálogo"|traducir:request }}</a>
+            <a href="{% url 'productos:colecciones' %}">{{ "Colecciones"|traducir:request }}</a>
+            
         </nav>
 
         {# ── Acciones ── #}
         <div class="header-acciones">
 
             {# Buscador #}
-            <button type="button" class="icono-btn" id="btn-buscar" aria-label="Buscar">
+            <button type="button"
+                    class="icono-btn"
+                    id="btn-buscar"
+                    aria-label="{{ 'Buscar'|traducir:request }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
                 </svg>
             </button>
-            <form class="buscador-header" id="caja-buscar" action="{% url 'productos:catalogo' %}" method="get" style="display:none;">
-                <input type="text" name="q" placeholder="Buscar joyas..." value="{{ request.GET.q|default:'' }}">
+
+            <form class="buscador-header"
+                  id="caja-buscar"
+                  action="{% url 'productos:catalogo' %}"
+                  method="get"
+                  style="display:none;">
+                <input type="text"
+                       name="q"
+                       placeholder="{{ 'Buscar joyas...'|traducir:request }}"
+                       value="{{ request.GET.q|default:'' }}">
             </form>
 
             {# Favoritos #}
-            <a href="{% url 'productos:favoritos' %}" class="icono-btn" aria-label="Mis favoritos">
+            <a href="{% url 'productos:favoritos' %}"
+               class="icono-btn"
+               aria-label="{{ 'Mis favoritos'|traducir:request }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
                 </svg>
             </a>
 
             {# Carrito #}
-            <a href="{% url 'carrito:ver_carrito' %}" class="icono-btn carrito-btn" aria-label="Carrito">
+            <a href="{% url 'carrito:ver_carrito' %}"
+               class="icono-btn carrito-btn"
+               aria-label="{{ 'Carrito'|traducir:request }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974a1.125 1.125 0 011.119 1.007z"/>
                 </svg>
+
                 {% if carrito_actual|length %}
                     <span class="carrito-badge">{{ carrito_actual|length }}</span>
                 {% endif %}
@@ -54,53 +72,157 @@
             {% if user.is_authenticated %}
                 <div class="menu-usuario">
                     <span>{{ user.first_name|default:user.username }} ▾</span>
+
                     <div class="submenu">
-                        <a href="{% url 'usuarios:perfil' %}">Mi perfil</a>
-                        <a href="{% url 'productos:favoritos' %}">Mis favoritos</a>
-                        <a href="{% url 'usuarios:direcciones' %}">Mis direcciones</a>
-                        <a href="{% url 'usuarios:historial_pedidos' %}">Mis pedidos</a>
+                        <a href="{% url 'usuarios:perfil' %}">
+                            {{ "Mi perfil"|traducir:request }}
+                        </a>
+
+                        <a href="{% url 'productos:favoritos' %}">
+                            {{ "Mis favoritos"|traducir:request }}
+                        </a>
+
+                        <a href="{% url 'usuarios:direcciones' %}">
+                            {{ "Mis direcciones"|traducir:request }}
+                        </a>
+
+                        <a href="{% url 'usuarios:historial_pedidos' %}">
+                            {{ "Mis pedidos"|traducir:request }}
+                        </a>
+
                         {% if user.is_staff %}
-                            <a href="{% url 'admin:index' %}">Panel administrativo</a>
+                            <a href="{% url 'admin:index' %}">
+                                {{ "Panel administrativo"|traducir:request }}
+                            </a>
                         {% endif %}
+
                         <form action="{% url 'usuarios:logout' %}" method="post">
                             {% csrf_token %}
-                            <button type="submit" class="link-boton" style="text-decoration:none;">Cerrar sesión</button>
+                            <button type="submit"
+                                    class="link-boton"
+                                    style="text-decoration:none;">
+                                {{ "Cerrar sesión"|traducir:request }}
+                            </button>
                         </form>
                     </div>
                 </div>
+
             {% else %}
-                <a href="{% url 'usuarios:login' %}" class="icono-btn" aria-label="Iniciar sesión">
+
+                <a href="{% url 'usuarios:login' %}"
+                   class="icono-btn"
+                   aria-label="{{ 'Iniciar sesión'|traducir:request }}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
                     </svg>
                 </a>
+
             {% endif %}
 
+            {# Idioma #}
+            <form action="{% url 'traduccion:cambiar_idioma' %}"
+                  method="post"
+                  class="selector-idioma">
+
+                {% csrf_token %}
+
+                <input type="hidden"
+                       name="siguiente"
+                       value="{{ request.get_full_path }}">
+
+                {% for codigo, nombre in idiomas_disponibles %}
+                    <button type="submit"
+                            name="idioma"
+                            value="{{ codigo }}"
+                            class="lang-btn {% if idioma_actual == codigo %}activo{% endif %}"
+                            title="{{ nombre }}">
+                        {{ codigo|upper }}
+                    </button>
+                {% endfor %}
+            </form>
+
             {# Menú móvil #}
-            <button class="icono-btn menu-movil-btn" id="menu-movil-btn" aria-label="Menú">
+            <button class="icono-btn menu-movil-btn"
+                    id="menu-movil-btn"
+                    aria-label="{{ 'Menú'|traducir:request }}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
                 </svg>
             </button>
+
         </div>
     </div>
 
     {# ── Navegación móvil ── #}
     <div class="nav-movil" id="nav-movil">
+
         <form action="{% url 'productos:catalogo' %}" method="get">
-            <input type="text" name="q" placeholder="Buscar joyas..." value="{{ request.GET.q|default:'' }}"
+            <input type="text"
+                   name="q"
+                   placeholder="{{ 'Buscar joyas...'|traducir:request }}"
+                   value="{{ request.GET.q|default:'' }}"
                    style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:2px;font-family:inherit;">
         </form>
-        <a href="{% url 'productos:inicio' %}">Inicio</a>
-        <a href="{% url 'productos:catalogo' %}">Catálogo</a>
-        <a href="{% url 'productos:colecciones' %}">Colecciones</a>
-        <a href="{% url 'productos:favoritos' %}">Favoritos</a>
+
+        <a href="{% url 'productos:inicio' %}">
+            {{ "Inicio"|traducir:request }}
+        </a>
+
+        <a href="{% url 'productos:catalogo' %}">
+            {{ "Catálogo"|traducir:request }}
+        </a>
+
+        <a href="{% url 'productos:colecciones' %}">
+            {{ "Colecciones"|traducir:request }}
+        </a>
+
+        <a href="{% url 'productos:favoritos' %}">
+            {{ "Favoritos"|traducir:request }}
+        </a>
+
         {% if user.is_authenticated %}
-            <a href="{% url 'usuarios:perfil' %}">Mi perfil</a>
-            <a href="{% url 'usuarios:historial_pedidos' %}">Mis pedidos</a>
+
+            <a href="{% url 'usuarios:perfil' %}">
+                {{ "Mi perfil"|traducir:request }}
+            </a>
+
+            <a href="{% url 'usuarios:historial_pedidos' %}">
+                {{ "Mis pedidos"|traducir:request }}
+            </a>
+
         {% else %}
-            <a href="{% url 'usuarios:login' %}">Iniciar sesión</a>
-            <a href="{% url 'usuarios:registro' %}">Registrarse</a>
+
+            <a href="{% url 'usuarios:login' %}">
+                {{ "Iniciar sesión"|traducir:request }}
+            </a>
+
+            <a href="{% url 'usuarios:registro' %}">
+                {{ "Registrarse"|traducir:request }}
+            </a>
+
         {% endif %}
+
+        <form action="{% url 'traduccion:cambiar_idioma' %}"
+              method="post"
+              class="selector-idioma"
+              style="margin-top:8px;">
+
+            {% csrf_token %}
+
+            <input type="hidden"
+                   name="siguiente"
+                   value="{{ request.get_full_path }}">
+
+            {% for codigo, nombre in idiomas_disponibles %}
+                <button type="submit"
+                        name="idioma"
+                        value="{{ codigo }}"
+                        class="lang-btn {% if idioma_actual == codigo %}activo{% endif %}">
+                    {{ nombre|traducir:request }}
+                </button>
+            {% endfor %}
+
+        </form>
+
     </div>
 </header>

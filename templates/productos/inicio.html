@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load traducir_tags %}
 {% block titulo %}Bejeweled — Joyería Fina{% endblock %}
 
 {% block cuerpo %}
@@ -20,14 +21,12 @@
         <div class="contenedor">
             <div class="hero-texto">
                 <h1>
-                    Encuentra la joya<br>
-                    perfecta para<br>
-                    <span class="destacado">cada momento</span>
+                    {{ "Encuentra la joya perfecta para cada momento"|traducir:request }}
                 </h1>
-                <p>Piezas únicas elaboradas con los metales y piedras preciosas más selectas del mundo. Exclusividad y calidad en cada detalle.</p>
+                <p>{{ "Piezas únicas elaboradas con los metales y piedras preciosas más selectas del mundo. Exclusividad y calidad en cada detalle."|traducir:request }}</p>
                 <div class="hero-botones">
-                    <a href="{% url 'productos:colecciones' %}" class="btn btn-primario">Ver Colección</a>
-                    <a href="{% url 'productos:catalogo' %}" class="btn btn-claro">Explorar Catálogo</a>
+                    <a href="{% url 'productos:colecciones' %}" class="btn btn-primario">{{ "Ver Colección"|traducir:request }}</a>
+                    <a href="{% url 'productos:catalogo' %}" class="btn btn-claro">{{ "Explorar Catálogo"|traducir:request }}</a>
                 </div>
             </div>
         </div>
@@ -39,11 +38,11 @@
 {# ══════════ BANDA DE GARANTÍAS ══════════ #}
 <div class="banda-garantias">
     <div class="contenedor">
-        <span><i class="rombo">◆</i> Certificación Internacional</span>
-        <span><i class="rombo">◆</i> Metales de Primera Calidad</span>
-        <span><i class="rombo">◆</i> Diseño Exclusivo</span>
-        <span><i class="rombo">◆</i> Garantía de por Vida</span>
-        <span><i class="rombo">◆</i> Envío Asegurado</span>
+        <span><i class="rombo">◆</i> {{ "Certificación Internacional"|traducir:request }}</span>
+        <span><i class="rombo">◆</i> {{ "Metales de Primera Calidad"|traducir:request }}</span>
+        <span><i class="rombo">◆</i> {{ "Diseño Exclusivo"|traducir:request }}</span>
+        <span><i class="rombo">◆</i> {{ "Garantía de por Vida"|traducir:request }}</span>
+        <span><i class="rombo">◆</i> {{ "Envío Asegurado"|traducir:request }}</span>
     </div>
 </div>
 
@@ -53,11 +52,11 @@
         <div class="seccion-titulo">
             <div class="seccion-eyebrow">
                 <div class="linea izq"></div>
-                <span>Explorar</span>
+                <span>{{ "Explorar"|traducir:request }}</span>
                 <div class="linea der"></div>
             </div>
-            <h2>Categorías</h2>
-            <p>Descubre nuestra selección de joyas finas organizadas para ti</p>
+            <h2>{{ "Categorías"|traducir:request }}</h2>
+            <p>{{ "Descubre nuestra selección de joyas finas organizadas para ti"|traducir:request }}</p>
         </div>
 
         {% if categorias %}
@@ -65,14 +64,31 @@
                 {% for categoria in categorias %}
                     <a href="{% url 'productos:catalogo' %}?categoria={{ categoria.slug }}" class="tarjeta-categoria">
                         {% if categoria.imagen %}
-                            <img src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}">
-                        {% else %}
-                            <img src="https://images.unsplash.com/photo-1588444650733-d0767b753fc8?w=600&h=700&fit=crop&auto=format"
-                                 alt="{{ categoria.nombre }}">
-                        {% endif %}
+    <img src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}">
+{% else %}
+    {% if "anillo" in categoria.nombre|lower %}
+        <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=700&fit=crop&auto=format"
+             alt="{{ categoria.nombre }}">
+    {% elif "collar" in categoria.nombre|lower %}
+        <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=700&fit=crop&auto=format"
+             alt="{{ categoria.nombre }}">
+    {% elif "pulsera" in categoria.nombre|lower %}
+        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=700&fit=crop&auto=format"
+             alt="{{ categoria.nombre }}">
+    {% elif "arete" in categoria.nombre|lower %}
+        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=700&fit=crop&auto=format"
+             alt="{{ categoria.nombre }}">
+    {% elif "dije" in categoria.nombre|lower %}
+        <img src="https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=600&h=700&fit=crop&auto=format"
+             alt="{{ categoria.nombre }}">
+    {% else %}
+        <img src="https://images.unsplash.com/photo-1588444650733-d0767b753fc8?w=600&h=700&fit=crop&auto=format"
+             alt="{{ categoria.nombre }}">
+    {% endif %}
+{% endif %}
                         <div class="info">
-                            <h3>{{ categoria.nombre }}</h3>
-                            <span>{{ categoria.productos.count }} pieza{{ categoria.productos.count|pluralize:"s" }}</span>
+                            <h3>{{ categoria.nombre|traducir:request }}</h3>
+                            <span>{{ categoria.productos.count }} {{ "pieza"|traducir:request }}{{ categoria.productos.count|pluralize:"s" }}</span>
                         </div>
                     </a>
                 {% endfor %}
@@ -80,7 +96,7 @@
         {% else %}
             <div class="vacio">
                 <div class="icono">◆</div>
-                <p>Aún no hay categorías registradas. Créalas desde el panel administrativo.</p>
+                <p>{{ "Aún no hay categorías registradas. Créalas desde el panel administrativo."|traducir:request }}</p>
             </div>
         {% endif %}
     </div>
@@ -92,8 +108,8 @@
 <section class="seccion" style="background: var(--muted);">
     <div class="contenedor">
         <div class="seccion-titulo">
-            <h2>Joyas Destacadas</h2>
-            <p>Piezas seleccionadas por su excepcional diseño y calidad</p>
+            <h2>{{ "Joyas Destacadas"|traducir:request }}</h2>
+            <p>{{ "Piezas seleccionadas por su excepcional diseño y calidad"|traducir:request }}</p>
         </div>
 
         {% if destacados %}
@@ -105,7 +121,7 @@
 
             <div style="text-align:center; margin-top:48px;">
                 <a href="{% url 'productos:catalogo' %}" class="btn btn-contorno">
-                    Ver Todos los Productos
+                    {{ "Ver Todos los Productos"|traducir:request }}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
                     </svg>
@@ -114,44 +130,121 @@
         {% else %}
             <div class="vacio">
                 <div class="icono">◆</div>
-                <p>Todavía no hay productos en el catálogo.</p>
+                <p>{{ "Todavía no hay productos en el catálogo."|traducir:request }}</p>
             </div>
         {% endif %}
     </div>
 </section>
 
 {# ══════════ COLECCIONES ══════════ #}
+{# ══════════ COLECCIONES ══════════ #}
 {% if colecciones %}
 <section class="seccion">
     <div class="contenedor">
+
         <div class="seccion-titulo">
-            <h2>Nuestras Colecciones</h2>
-            <p>Cada colección cuenta una historia única de elegancia y artesanía</p>
+            <h2>{{ "Nuestras Colecciones"|traducir:request }}</h2>
+            <p>
+                {{ "Cada colección cuenta una historia única de elegancia y artesanía"|traducir:request }}
+            </p>
         </div>
 
         <div class="grid-colecciones">
+
             {% for coleccion in colecciones %}
-                <a href="{{ coleccion.get_absolute_url }}" class="tarjeta-coleccion">
+
+                <a href="{{ coleccion.get_absolute_url }}"
+                   class="tarjeta-coleccion">
+
+                    {# ═════ IMAGEN DE LA COLECCIÓN ═════ #}
+
                     {% if coleccion.imagen %}
-                        <img src="{{ coleccion.imagen.url }}" alt="{{ coleccion.nombre }}">
-                    {% else %}
-                        <img src="https://images.unsplash.com/photo-1611107683227-e9060eccd846?w=800&h=500&fit=crop&auto=format"
+
+                        {# Si tiene imagen en el administrador, usamos esa #}
+                        <img src="{{ coleccion.imagen.url }}"
                              alt="{{ coleccion.nombre }}">
+
+                    {% else %}
+
+                        {# Imágenes diferentes según el nombre de la colección #}
+
+                        {% if "elegance" in coleccion.nombre|lower or "elegante" in coleccion.nombre|lower %}
+                            <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=900&h=600&fit=crop&auto=format"
+                                 alt="{{ coleccion.nombre }}">
+
+                        {% elif "royal" in coleccion.nombre|lower or "real" in coleccion.nombre|lower %}
+                            <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=900&h=600&fit=crop&auto=format"
+                                 alt="{{ coleccion.nombre }}">
+
+                        {% elif "gold" in coleccion.nombre|lower or "oro" in coleccion.nombre|lower %}
+                            <img src="https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=900&h=600&fit=crop&auto=format"
+                                 alt="{{ coleccion.nombre }}">
+
+                        {% elif "silver" in coleccion.nombre|lower or "plata" in coleccion.nombre|lower %}
+                            <img src="https://images.unsplash.com/photo-1617038260897-41a1f14a8ca0?w=900&h=600&fit=crop&auto=format"
+                                 alt="{{ coleccion.nombre }}">
+
+                        {% elif "classic" in coleccion.nombre|lower or "clásic" in coleccion.nombre|lower %}
+                            <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=900&h=600&fit=crop&auto=format"
+                                 alt="{{ coleccion.nombre }}">
+
+                        {% elif "minimal" in coleccion.nombre|lower %}
+                            <img src="https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=900&h=600&fit=crop&auto=format"
+                                 alt="{{ coleccion.nombre }}">
+
+                        {% else %}
+
+                            {# Imagen diferente para cualquier otra colección #}
+                            <img src="https://images.unsplash.com/photo-1602173574767-37ac01994b2a?w=900&h=600&fit=crop&auto=format"
+                                 alt="{{ coleccion.nombre }}">
+
+                        {% endif %}
+
                     {% endif %}
-                    <div class="franja" style="background: {{ coleccion.color_acento }};"></div>
-                    <div class="info">
-                        <h3>{{ coleccion.nombre }}</h3>
-                        <p>{{ coleccion.descripcion|truncatewords:22 }}</p>
-                        <span class="explorar" style="color: {{ coleccion.color_acento }};">
-                            Explorar
-                            <svg class="flecha" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
-                            </svg>
-                        </span>
+
+                    <div class="franja"
+                         style="background: {{ coleccion.color_acento }};">
                     </div>
+
+                    <div class="info">
+
+                        <h3>
+                            {{ coleccion.nombre|traducir:request }}
+                        </h3>
+
+                        <p>
+                            {{ coleccion.descripcion|traducir:request|truncatewords:22 }}
+                        </p>
+
+                        <span class="explorar"
+                              style="color: {{ coleccion.color_acento }};">
+
+                            {{ "Explorar"|traducir:request }}
+
+                            <svg class="flecha"
+                                 viewBox="0 0 24 24"
+                                 fill="none"
+                                 stroke="currentColor"
+                                 stroke-width="2"
+                                 width="14"
+                                 height="14">
+
+                                <path stroke-linecap="round"
+                                      stroke-linejoin="round"
+                                      d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+
+                            </svg>
+
+                        </span>
+
+                    </div>
+
                 </a>
+
             {% endfor %}
+
         </div>
+
     </div>
 </section>
 {% endif %}

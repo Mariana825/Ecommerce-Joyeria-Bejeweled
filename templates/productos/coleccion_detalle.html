@@ -1,33 +1,64 @@
 {% extends 'base.html' %}
-{% block titulo %}{{ coleccion.nombre }} | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}
+    {{ coleccion.nombre|traducir:request }} | Bejeweled
+{% endblock %}
 
 {% block contenido %}
+
 <p class="migas">
-    <a href="{% url 'productos:inicio' %}">Inicio</a> ·
-    <a href="{% url 'productos:colecciones' %}">Colecciones</a> ·
-    {{ coleccion.nombre }}
+    <a href="{% url 'productos:inicio' %}">
+        {{ "Inicio"|traducir:request }}
+    </a>
+    ·
+    <a href="{% url 'productos:colecciones' %}">
+        {{ "Colecciones"|traducir:request }}
+    </a>
+    ·
+    {{ coleccion.nombre|traducir:request }}
 </p>
 
 <div class="seccion-titulo">
+
     <div class="seccion-eyebrow">
         <div class="linea izq"></div>
-        <span>Colección</span>
+
+        <span>{{ "Colección"|traducir:request }}</span>
+
         <div class="linea der"></div>
     </div>
-    <h1>{{ coleccion.nombre }}</h1>
-    {% if coleccion.descripcion %}<p>{{ coleccion.descripcion }}</p>{% endif %}
+
+    <h1>
+        {{ coleccion.nombre|traducir:request }}
+    </h1>
+
+    {% if coleccion.descripcion %}
+        <p>
+            {{ coleccion.descripcion|traducir:request }}
+        </p>
+    {% endif %}
+
 </div>
 
 {% if productos %}
+
     <div class="grid-productos">
         {% for producto in productos %}
             {% include 'partials/tarjeta_producto.html' %}
         {% endfor %}
     </div>
+
 {% else %}
+
     <div class="vacio">
         <div class="icono">◆</div>
-        <p>Esta colección todavía no tiene piezas asignadas.</p>
+
+        <p>
+            {{ "Esta colección todavía no tiene piezas asignadas."|traducir:request }}
+        </p>
     </div>
+
 {% endif %}
+
 {% endblock %}

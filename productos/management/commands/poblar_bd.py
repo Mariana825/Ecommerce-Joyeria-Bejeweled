@@ -7,27 +7,31 @@ Uso:
 
 Crea:
     - 5 categorías, 6 materiales, 4 colecciones
-    - 20 productos (con stock, agotados, destacados y nuevos)
+    - 20 productos (con stock, agotados, destacados y nuevos), cada uno con
+      su propia imagen de producto (ver productos/fixtures/imagenes_productos/)
     - 1 usuario de prueba con perfil y 2 direcciones
     - 6 favoritos y 6 reseñas de ese usuario
     - 1 pedido con 3 artículos
     - 3 suscriptores al newsletter
-
-No se suben imágenes: las plantillas muestran una imagen de respaldo cuando
-un producto o categoría no tiene foto.
 """
 
 from decimal import Decimal
+from pathlib import Path
 
 from django.contrib.auth.models import User
+from django.core.files import File
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
+from django.utils.text import slugify
 
 from pedidos.models import Pedido, PedidoItem
 from productos.models import (
     Categoria, Coleccion, Favorito, Material, Producto, Resena, Suscriptor,
 )
+
+DIR_IMAGENES_PRODUCTOS = Path(__file__).resolve().parent.parent.parent / 'fixtures' / 'imagenes_productos'
+
 from usuarios.models import DireccionEnvio
 
 USUARIO_PRUEBA = 'mariana'
@@ -77,6 +81,7 @@ class Command(BaseCommand):
         Pedido.objects.all().delete()
         Resena.objects.all().delete()
         Favorito.objects.all().delete()
+        self._borrar_imagenes_productos()
         Producto.objects.all().delete()
         Coleccion.objects.all().delete()
         Categoria.objects.all().delete()
@@ -85,6 +90,15 @@ class Command(BaseCommand):
         DireccionEnvio.objects.filter(usuario__username=USUARIO_PRUEBA).delete()
         User.objects.filter(username=USUARIO_PRUEBA).delete()
         self.stdout.write(self.style.WARNING('  Datos anteriores eliminados.'))
+
+    def _borrar_imagenes_productos(self):
+        """
+        Borra del disco las imágenes que quedaron guardadas para los
+        productos de prueba, para que `--limpiar` sea repetible sin ir
+        acumulando copias con sufijos (imagen_abc123.jpg, imagen_xyz789.jpg...).
+        """
+        for producto in Producto.objects.exclude(imagen_principal=''):
+            producto.imagen_principal.delete(save=False)
 
     # ------------------------------------------------------------------
     def _crear_categorias(self):
@@ -235,14 +249,34 @@ class Command(BaseCommand):
                     'activo': activo,
                 },
             )
+            self._asignar_imagen(obj, nombre)
             productos.append(obj)
 
+        con_imagen = sum(1 for p in productos if p.imagen_principal)
         agotados = sum(1 for p in productos if p.existencias == 0)
         self.stdout.write(
             f'  Productos: {len(productos)} '
-            f'({sum(1 for p in productos if p.destacado)} destacados, {agotados} agotados)'
+            f'({sum(1 for p in productos if p.destacado)} destacados, {agotados} agotados, '
+            f'{con_imagen} con imagen)'
         )
         return productos
+
+    def _asignar_imagen(self, producto, nombre):
+        """
+        Asigna la imagen de producto correspondiente (generada de antemano,
+        una distinta para cada pieza — ver productos/fixtures/imagenes_productos/)
+        si el producto todavía no tiene una.
+        """
+        if producto.imagen_principal:
+            return
+
+        archivo = DIR_IMAGENES_PRODUCTOS / f'{slugify(nombre)}.jpg'
+        if not archivo.exists():
+            self.stdout.write(self.style.WARNING(f'  Sin imagen de prueba para "{nombre}" ({archivo.name})'))
+            return
+
+        with archivo.open('rb') as f:
+            producto.imagen_principal.save(archivo.name, File(f), save=True)
 
     # ------------------------------------------------------------------
     def _crear_usuario(self):

@@ -1,27 +1,162 @@
 {% extends 'base.html' %}
-{% block titulo %}Pedido registrado | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Pedido registrado"|traducir:request }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
-<div class="panel panel-angosto centrado">
+<div class="panel panel-angosto centrado" id="panel-pago">
     <div style="font-size:2.4rem;color:var(--gold);margin-bottom:8px;">◆</div>
-    <h1>¡Pedido registrado!</h1>
-    <p class="subtitulo">Tu pedido <strong>#{{ pedido.id }}</strong> se registró correctamente.</p>
+    <h1>{{ "¡Pedido registrado!"|traducir:request }}</h1>
+    <p class="subtitulo">{{ "Tu pedido"|traducir:request }} <strong>#{{ pedido.id }}</strong> {{ "se registró correctamente."|traducir:request }}</p>
 
     <div class="resumen-total" style="justify-content:center;gap:16px;border-top:none;">
-        <span class="etiqueta-total">Total</span>
+        <span class="etiqueta-total">{{ "Total"|traducir:request }}</span>
         <span class="monto">${{ pedido.total|floatformat:2 }}</span>
     </div>
 
-    <div class="aviso">
-        Este pedido está <strong>pendiente de pago</strong>. La integración con PayPal se agregará
-        en una próxima etapa del proyecto; por ahora el pedido queda registrado con sus productos
-        y su dirección de envío.
-    </div>
+    {% if pedido.estado == 'pagado' %}
+        <div class="aviso" style="border-left-color:var(--success);">
+            <strong>{{ "¡Pago confirmado!"|traducir:request }}</strong>
+            {{ "Referencia PayPal:"|traducir:request }} {{ pedido.referencia_pago }}
+        </div>
+        <a href="{% url 'pedidos:detalle' pedido.id %}" class="btn btn-primario">{{ "Ver detalle del pedido"|traducir:request }}</a>
 
-    <a href="{% url 'pedidos:detalle' pedido.id %}" class="btn btn-primario">Ver detalle del pedido</a>
+    {% elif paypal_configurado %}
+        <p class="subtitulo" style="margin-top:24px;">
+            {{ "Completa tu pago de forma segura con PayPal (modo de pruebas / sandbox):"|traducir:request }}
+        </p>
+
+        <div id="paypal-botones" style="margin:20px 0;"></div>
+
+        <p id="paypal-mensaje" style="font-size:0.8rem;color:var(--danger);display:none;"></p>
+
+        <div class="aviso">
+            {{ "Estás en el entorno"|traducir:request }} <strong>Sandbox</strong>
+            {{ "de PayPal: no se realiza ningún cobro real."|traducir:request }}
+            {{ "Usa una cuenta de comprador de prueba de"|traducir:request }}
+            <a href="https://developer.paypal.com/dashboard/accounts" target="_blank" rel="noopener" style="color:var(--lilac-deep);">developer.paypal.com</a>.
+        </div>
+
+        <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency={{ paypal_currency }}&components=buttons"></script>
+        <script>
+        var mensajePayPal = document.getElementById('paypal-mensaje');
+
+        function mostrarError(mensaje) {
+            console.error('PayPal:', mensaje);
+            if (mensajePayPal) {
+                mensajePayPal.textContent = mensaje;
+                mensajePayPal.style.display = 'block';
+            }
+        }
+
+        if (!window.paypal || !window.paypal.Buttons) {
+            mostrarError('{{ "No se pudo cargar PayPal. Recarga la página e inténtalo nuevamente."|traducir:request }}');
+        } else {
+            paypal.Buttons({
+                style: {
+                    color: 'gold',
+                    shape: 'rect',
+                    label: 'paypal',
+                    height: 45
+                },
+                createOrder: function() {
+                    return fetch("{% url 'pagos:crear_orden' pedido.id %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(function(res) {
+                        return res.json().then(function(datos) {
+                            if (!res.ok) {
+                                throw new Error(datos.error || 'No se pudo crear la orden de PayPal.');
+                            }
+                            return datos;
+                        });
+                    })
+                    .then(function(datos) {
+                        if (!datos.id) {
+                            throw new Error('PayPal no devolvió un ID de orden.');
+                        }
+                        return datos.id;
+                    })
+                    .catch(function(error) {
+                        console.error('Error creando orden PayPal:', error);
+                        mostrarError(error.message || '{{ "No se pudo iniciar el pago con PayPal."|traducir:request }}');
+                        throw error;
+                    });
+                },
+                onApprove: function(data) {
+                    return fetch("{% url 'pagos:capturar_orden' pedido.id %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({orderID: data.orderID})
+                    })
+                    .then(function(res) {
+                        return res.json().then(function(datos) {
+                            if (!res.ok) {
+                                throw new Error(datos.error || 'PayPal no pudo completar la captura.');
+                            }
+                            return datos;
+                        });
+                    })
+                    .then(function(datos) {
+                        if (datos.estado !== 'pagado') {
+                            throw new Error(datos.error || 'El pago no quedó confirmado.');
+                        }
+                        window.location.reload();
+                    })
+                    .catch(function(error) {
+                        console.error('Error capturando PayPal:', error);
+                        mostrarError(error.message || '{{ "Hubo un problema al confirmar el pago. Intenta de nuevo."|traducir:request }}');
+                    });
+                },
+                onCancel: function(data) {
+    console.log('========== PAYPAL CANCEL ==========');
+    console.log('data:', data);
+    console.log('orderID:', data && data.orderID);
+    console.log('===================================');
+
+    mostrarError(
+        'PayPal canceló el proceso. Order ID: ' +
+        (data && data.orderID ? data.orderID : 'NO DISPONIBLE')
+    );
+},
+onError: function(error) {
+    console.error('========== PAYPAL ERROR ==========');
+    console.error(error);
+    console.error('==================================');
+
+    mostrarError(
+        'Error de PayPal: ' +
+        (error && error.message ? error.message : 'Error desconocido')
+    );
+}
+            }).render('#paypal-botones').catch(function(error) {
+                console.error('Error renderizando PayPal:', error);
+                mostrarError('{{ "No se pudo mostrar el botón de PayPal."|traducir:request }}');
+            });
+        }
+        </script>
+
+    {% else %}
+        <div class="aviso">
+            <strong>{{ "Pago pendiente."|traducir:request }}</strong>
+            {{ "El pago con PayPal todavía no está configurado en este servidor"|traducir:request }}.
+            {{ "Tu pedido quedó registrado con sus productos y dirección de envío."|traducir:request }}
+        </div>
+        <a href="{% url 'pedidos:detalle' pedido.id %}" class="btn btn-primario">{{ "Ver detalle del pedido"|traducir:request }}</a>
+    {% endif %}
+
     <div class="enlaces-form">
-        <p><a href="{% url 'productos:catalogo' %}">Seguir comprando</a></p>
+        <p><a href="{% url 'productos:catalogo' %}">{{ "Seguir comprando"|traducir:request }}</a></p>
     </div>
 </div>
 {% endblock %}

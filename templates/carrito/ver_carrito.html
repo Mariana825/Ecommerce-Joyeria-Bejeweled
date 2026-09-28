@@ -1,20 +1,27 @@
 {% extends 'base.html' %}
-{% block titulo %}Mi carrito | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Mi carrito"|traducir:request }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <div class="seccion-titulo">
-    <h1>Mi carrito</h1>
-    <p>Revisa tus piezas antes de confirmar el pedido</p>
+    <h1>{{ "Mi carrito"|traducir:request }}</h1>
+    <p>{{ "Revisa tus piezas antes de confirmar el pedido"|traducir:request }}</p>
 </div>
 
 {% if carrito|length %}
     <div class="layout-carrito">
-
         <div>
             <table class="tabla">
                 <thead>
-                    <tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th><th></th></tr>
+                    <tr>
+                        <th>{{ "Producto"|traducir:request }}</th>
+                        <th>{{ "Precio"|traducir:request }}</th>
+                        <th>{{ "Cantidad"|traducir:request }}</th>
+                        <th>{{ "Subtotal"|traducir:request }}</th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
                     {% for item in carrito %}
@@ -46,7 +53,7 @@
                             <td>
                                 <form action="{% url 'carrito:eliminar' item.producto.id %}" method="post">
                                     {% csrf_token %}
-                                    <button type="submit" class="link-boton">Eliminar</button>
+                                    <button type="submit" class="link-boton">{{ "Eliminar"|traducir:request }}</button>
                                 </form>
                             </td>
                         </tr>
@@ -55,37 +62,42 @@
             </table>
 
             <div style="margin-top:28px;">
-                <a href="{% url 'productos:catalogo' %}" class="btn btn-contorno btn-pequeno">← Seguir comprando</a>
+                <a href="{% url 'productos:catalogo' %}" class="btn btn-contorno btn-pequeno">
+                    {{ "← Seguir comprando"|traducir:request }}
+                </a>
             </div>
         </div>
 
-        {# ── Resumen ── #}
         <aside class="resumen-lateral">
-            <h3>Resumen</h3>
+            <h3>{{ "Resumen"|traducir:request }}</h3>
             <div class="resumen-linea">
-                <span>Productos ({{ carrito|length }})</span>
+                <span>{{ "Productos"|traducir:request }} ({{ carrito|length }})</span>
                 <span>${{ carrito.total|floatformat:2 }}</span>
             </div>
             <div class="resumen-linea">
-                <span>Envío</span>
-                <span>Se calcula al confirmar</span>
+                <span>{{ "Envío"|traducir:request }}</span>
+                <span>{{ "Se calcula al confirmar"|traducir:request }}</span>
             </div>
             <div class="resumen-total">
-                <span class="etiqueta-total">Total</span>
+                <span class="etiqueta-total">{{ "Total"|traducir:request }}</span>
                 <span class="monto">${{ carrito.total|floatformat:2 }}</span>
             </div>
-            <a href="{% url 'pedidos:checkout' %}" class="btn btn-oro">Proceder al pago</a>
+            <a href="{% url 'pedidos:checkout' %}" class="btn btn-oro">
+                {{ "Proceder al pago"|traducir:request }}
+            </a>
             <p style="font-size:0.7rem;color:var(--muted-foreground);text-align:center;margin-top:14px;line-height:1.6;">
-                Compra protegida · Certificado de autenticidad incluido
+                {{ "Compra protegida · Certificado de autenticidad incluido"|traducir:request }}
             </p>
         </aside>
     </div>
 {% else %}
     <div class="vacio">
         <div class="icono">◆</div>
-        <h3 style="margin:0 0 8px;">Tu carrito está vacío</h3>
-        <p style="font-size:0.85rem;">Descubre nuestras piezas y encuentra la indicada.</p>
-        <a href="{% url 'productos:catalogo' %}" class="btn btn-primario" style="margin-top:20px;">Ver catálogo</a>
+        <h3 style="margin:0 0 8px;">{{ "Tu carrito está vacío"|traducir:request }}</h3>
+        <p style="font-size:0.85rem;">{{ "Descubre nuestras piezas y encuentra la indicada."|traducir:request }}</p>
+        <a href="{% url 'productos:catalogo' %}" class="btn btn-primario" style="margin-top:20px;">
+            {{ "Ver catálogo"|traducir:request }}
+        </a>
     </div>
 {% endif %}
 {% endblock %}

@@ -8,8 +8,14 @@ urlpatterns = [
     path('cuenta/', include('usuarios.urls')),
     path('carrito/', include('carrito.urls')),
     path('pedidos/', include('pedidos.urls')),
+    path('pagos/', include('pagos.urls')),
+    path('chatbot/', include('chatbot.urls')),
+    path('idioma/', include('traduccion.urls')),
+    path('api/inventario/', include('inventario.urls')),
     path('', include('productos.urls')),  # catálogo como home
 ]
 
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

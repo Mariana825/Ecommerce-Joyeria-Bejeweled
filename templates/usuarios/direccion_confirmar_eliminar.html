@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
-{% block titulo %}Eliminar dirección | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Eliminar dirección"|traducir:request }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <div class="panel panel-angosto centrado">
-    <h1>¿Eliminar esta dirección?</h1>
+    <h1>{{ "¿Eliminar esta dirección?"|traducir:request }}</h1>
     <p class="subtitulo">
         {{ direccion.destinatario }}<br>
         {{ direccion.calle }} {{ direccion.numero }}, {{ direccion.ciudad }}
     </p>
     <form method="post">
         {% csrf_token %}
-        <button type="submit" class="btn btn-peligro">Sí, eliminar</button>
+        <button type="submit" class="btn btn-peligro">{{ "Sí, eliminar"|traducir:request }}</button>
     </form>
     <div class="enlaces-form">
-        <p><a href="{% url 'usuarios:direcciones' %}">Cancelar</a></p>
+        <p><a href="{% url 'usuarios:direcciones' %}">{{ "Cancelar"|traducir:request }}</a></p>
     </div>
 </div>
 {% endblock %}

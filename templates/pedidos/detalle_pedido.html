@@ -1,65 +1,265 @@
 {% extends 'base.html' %}
-{% block titulo %}Pedido #{{ pedido.id }} | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Pedido"|traducir:request }} #{{ pedido.id }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <p class="migas">
-    <a href="{% url 'productos:inicio' %}">Inicio</a> ·
-    <a href="{% url 'usuarios:historial_pedidos' %}">Mis pedidos</a> ·
-    Pedido #{{ pedido.id }}
+    <a href="{% url 'productos:inicio' %}">{{ "Inicio"|traducir:request }}</a> ·
+    <a href="{% url 'usuarios:historial_pedidos' %}">{{ "Mis pedidos"|traducir:request }}</a> ·
+    {{ "Pedido"|traducir:request }} #{{ pedido.id }}
 </p>
 
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:32px;">
-    <h1 style="font-size:2rem;margin:0;">Pedido #{{ pedido.id }}</h1>
-    <span class="estado-pedido estado-{{ pedido.estado }}">{{ pedido.get_estado_display }}</span>
+    <h1 style="font-size:2rem;margin:0;">{{ "Pedido"|traducir:request }} #{{ pedido.id }}</h1>
+    <span class="estado-pedido estado-{{ pedido.estado }}">{{ pedido.get_estado_display|traducir:request }}</span>
 </div>
 
-<p style="font-size:0.82rem;color:var(--muted-foreground);">Realizado el {{ pedido.creado|date:"d/m/Y \a \l\a\s H:i" }}</p>
+<p style="font-size:0.82rem;color:var(--muted-foreground);">
+    {{ "Realizado el"|traducir:request }} {{ pedido.creado|date:"d/m/Y \a \l\a\s H:i" }}
+</p>
 
 <div class="layout-checkout" style="margin-top:32px;">
     <div>
-        <h2 style="font-size:1.3rem;margin:0 0 16px;">Productos</h2>
+        <h2 style="font-size:1.3rem;margin:0 0 16px;">{{ "Productos"|traducir:request }}</h2>
+
         <table class="tabla">
             <thead>
-                <tr><th>Producto</th><th>Precio</th><th>Cant.</th><th>Subtotal</th></tr>
+                <tr>
+                    <th>{{ "Producto"|traducir:request }}</th>
+                    <th>{{ "Precio"|traducir:request }}</th>
+                    <th>{{ "Cant."|traducir:request }}</th>
+                    <th>{{ "Subtotal"|traducir:request }}</th>
+                </tr>
             </thead>
+
             <tbody>
                 {% for item in pedido.items.all %}
-                    <tr>
-                        <td>{{ item.nombre_producto }}</td>
-                        <td>${{ item.precio_unitario|floatformat:2 }}</td>
-                        <td>{{ item.cantidad }}</td>
-                        <td class="precio">${{ item.subtotal|floatformat:2 }}</td>
-                    </tr>
+                <tr>
+                    <td>{{ item.nombre_producto|traducir:request }}</td>
+                    <td>${{ item.precio_unitario|floatformat:2 }}</td>
+                    <td>{{ item.cantidad }}</td>
+                    <td class="precio">${{ item.subtotal|floatformat:2 }}</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
 
-        <h2 style="font-size:1.3rem;margin:40px 0 12px;">Dirección de envío</h2>
+        <h2 style="font-size:1.3rem;margin:40px 0 12px;">
+            {{ "Dirección de envío"|traducir:request }}
+        </h2>
+
         <div class="tarjeta-direccion">
             <span class="etiqueta-nombre">{{ pedido.nombre_destinatario }}</span>
             <div>{{ pedido.calle }} {{ pedido.numero }}{% if pedido.colonia %}, {{ pedido.colonia }}{% endif %}</div>
-            <div>{{ pedido.ciudad }}, {{ pedido.estado_direccion }}, CP {{ pedido.codigo_postal }}</div>
+            <div>{{ pedido.ciudad }}, {{ pedido.estado_direccion }}, {{ "CP"|traducir:request }} {{ pedido.codigo_postal }}</div>
             <div>{{ pedido.pais }}</div>
-            {% if pedido.telefono_contacto %}<div>Tel. {{ pedido.telefono_contacto }}</div>{% endif %}
+
+            {% if pedido.telefono_contacto %}
+            <div>{{ "Tel."|traducir:request }} {{ pedido.telefono_contacto }}</div>
+            {% endif %}
         </div>
     </div>
 
     <aside class="resumen-lateral">
-        <h3>Resumen</h3>
+        <h3>{{ "Resumen"|traducir:request }}</h3>
+
         <div class="resumen-linea">
-            <span>Estado</span>
-            <span>{{ pedido.get_estado_display }}</span>
+            <span>{{ "Estado"|traducir:request }}</span>
+            <span>{{ pedido.get_estado_display|traducir:request }}</span>
         </div>
+
         <div class="resumen-linea">
-            <span>Método de pago</span>
-            <span>{{ pedido.metodo_pago|default:"Por definir" }}</span>
+            <span>{{ "Método de pago"|traducir:request }}</span>
+            <span>{{ pedido.metodo_pago|default:"Por definir"|traducir:request }}</span>
         </div>
+
         <div class="resumen-total">
-            <span class="etiqueta-total">Total</span>
+            <span class="etiqueta-total">{{ "Total"|traducir:request }}</span>
             <span class="monto">${{ pedido.total|floatformat:2 }}</span>
         </div>
-        <a href="{% url 'usuarios:historial_pedidos' %}" class="btn btn-contorno">Volver a mis pedidos</a>
+
+        {% if pedido.estado == 'pendiente_pago' %}
+            <div style="margin-top:24px;">
+                <p style="font-size:0.85rem;margin-bottom:14px;text-align:center;">
+                    {{ "Este pedido está pendiente de pago."|traducir:request }}
+                </p>
+
+                <p style="font-size:0.8rem;text-align:center;color:var(--muted-foreground);margin-bottom:14px;">
+                    {{ "Puedes completar el pago con PayPal."|traducir:request }}
+                </p>
+
+                <div id="paypal-botones"></div>
+
+                <p id="paypal-mensaje"
+                   style="font-size:0.8rem;color:var(--danger);display:none;margin-top:12px;">
+                </p>
+            </div>
+
+            <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency={{ paypal_currency }}&components=buttons"></script>
+
+            <script>
+            var mensajePayPal = document.getElementById('paypal-mensaje');
+
+            function mostrarError(mensaje) {
+                console.error('PayPal:', mensaje);
+
+                if (mensajePayPal) {
+                    mensajePayPal.textContent = mensaje;
+                    mensajePayPal.style.display = 'block';
+                }
+            }
+
+            if (!window.paypal || !window.paypal.Buttons) {
+                mostrarError(
+                    '{{ "No se pudo cargar PayPal. Recarga la página e inténtalo nuevamente."|traducir:request }}'
+                );
+            } else {
+                paypal.Buttons({
+                    style: {
+                        color: 'gold',
+                        shape: 'rect',
+                        label: 'paypal',
+                        height: 45
+                    },
+
+                    createOrder: function() {
+                        console.log('PayPal: creando orden para pedido {{ pedido.id }}');
+
+                        return fetch("{% url 'pagos:crear_orden' pedido.id %}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(function(res) {
+                            console.log('Crear orden HTTP:', res.status);
+
+                            return res.json().then(function(datos) {
+                                if (!res.ok) {
+                                    throw new Error(
+                                        datos.error ||
+                                        'No se pudo crear la orden de PayPal.'
+                                    );
+                                }
+
+                                return datos;
+                            });
+                        })
+                        .then(function(datos) {
+                            console.log('Orden PayPal creada:', datos);
+
+                            if (!datos.id) {
+                                throw new Error(
+                                    'PayPal no devolvió un ID de orden.'
+                                );
+                            }
+
+                            return datos.id;
+                        })
+                        .catch(function(error) {
+                            mostrarError(
+                                error.message ||
+                                '{{ "No se pudo iniciar el pago con PayPal."|traducir:request }}'
+                            );
+
+                            throw error;
+                        });
+                    },
+
+                    onApprove: function(data) {
+                        console.log(
+                            'PayPal: pago aprobado.',
+                            data.orderID
+                        );
+
+                        return fetch("{% url 'pagos:capturar_orden' pedido.id %}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                orderID: data.orderID
+                            })
+                        })
+                        .then(function(res) {
+                            console.log(
+                                'Captura HTTP:',
+                                res.status
+                            );
+
+                            return res.json().then(function(datos) {
+                                if (!res.ok) {
+                                    throw new Error(
+                                        datos.error ||
+                                        'PayPal no pudo completar la captura.'
+                                    );
+                                }
+
+                                return datos;
+                            });
+                        })
+                        .then(function(datos) {
+                            console.log(
+                                'Respuesta de captura:',
+                                datos
+                            );
+
+                            if (datos.estado !== 'pagado') {
+                                throw new Error(
+                                    datos.error ||
+                                    'El pago no quedó confirmado.'
+                                );
+                            }
+
+                            window.location.reload();
+                        })
+                        .catch(function(error) {
+                            console.error(
+                                'Error capturando PayPal:',
+                                error
+                            );
+
+                            mostrarError(
+                                error.message ||
+                                '{{ "Hubo un problema al confirmar el pago. Intenta de nuevo."|traducir:request }}'
+                            );
+                        });
+                    },
+
+                    onCancel: function() {
+                        mostrarError(
+                            '{{ "El pago fue cancelado. Tu pedido sigue pendiente de pago."|traducir:request }}'
+                        );
+                    },
+
+                    onError: function(error) {
+                        console.error(
+                            'PayPal checkout error:',
+                            error
+                        );
+
+                        mostrarError(
+                            '{{ "PayPal encontró un problema durante el proceso de pago. Intenta nuevamente."|traducir:request }}'
+                        );
+                    }
+
+                }).render('#paypal-botones');
+            }
+            </script>
+
+        {% endif %}
+
+        <a href="{% url 'usuarios:historial_pedidos' %}"
+           class="btn btn-contorno"
+           style="margin-top:16px;">
+            {{ "Volver a mis pedidos"|traducir:request }}
+        </a>
     </aside>
 </div>
 {% endblock %}

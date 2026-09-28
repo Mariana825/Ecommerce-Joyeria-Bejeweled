@@ -1,15 +1,19 @@
 {% extends 'base.html' %}
-{% block titulo %}Mis favoritos | Bejeweled{% endblock %}
+{% load traducir_tags %}
+
+{% block titulo %}{{ "Mis favoritos | Bejeweled"|traducir:request }}{% endblock %}
 
 {% block contenido %}
 <div class="seccion-titulo">
     <div class="seccion-eyebrow">
         <div class="linea izq"></div>
-        <span>Tu lista de deseos</span>
+        <span>{{ "Tu lista de deseos"|traducir:request }}</span>
         <div class="linea der"></div>
     </div>
-    <h1>Mis Favoritos</h1>
-    <p>Las piezas que guardaste para pensarlo con calma</p>
+
+    <h1>{{ "Mis Favoritos"|traducir:request }}</h1>
+
+    <p>{{ "Las piezas que guardaste para pensarlo con calma"|traducir:request }}</p>
 </div>
 
 {% if favoritos %}
@@ -23,9 +27,20 @@
 {% else %}
     <div class="vacio">
         <div class="icono">♡</div>
-        <h3 style="margin:0 0 8px;">Todavía no tienes favoritos</h3>
-        <p style="font-size:0.85rem;">Toca el corazón en cualquier joya para guardarla aquí.</p>
-        <a href="{% url 'productos:catalogo' %}" class="btn btn-contorno btn-pequeno" style="margin-top:20px;">Explorar el catálogo</a>
+
+        <h3 style="margin:0 0 8px;">
+            {{ "Todavía no tienes favoritos"|traducir:request }}
+        </h3>
+
+        <p style="font-size:0.85rem;">
+            {{ "Toca el corazón en cualquier joya para guardarla aquí."|traducir:request }}
+        </p>
+
+        <a href="{% url 'productos:catalogo' %}"
+           class="btn btn-contorno btn-pequeno"
+           style="margin-top:20px;">
+            {{ "Explorar el catálogo"|traducir:request }}
+        </a>
     </div>
 {% endif %}
 {% endblock %}

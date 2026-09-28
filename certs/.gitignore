@@ -1,0 +1,5 @@
+# El script de generación sí se versiona; el certificado y la llave
+# privada NO — cada quien genera los suyos localmente.
+*.pem
+*.crt
+*.key

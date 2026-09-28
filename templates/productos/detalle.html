@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load traducir_tags %}
 {% block titulo %}{{ producto.nombre }} | Bejeweled{% endblock %}
 
 {% block contenido %}
@@ -36,7 +37,7 @@
 
     {# ── Información ── #}
     <div class="info-producto">
-        <h1>{{ producto.nombre }}</h1>
+        <h1>{{ producto.nombre|traducir:request }}</h1>
 
         {% if producto.total_resenas %}
             <div class="resumen-calificacion">
@@ -50,9 +51,9 @@
         <p class="precio-grande">${{ producto.precio|floatformat:2 }}</p>
 
         {% if producto.disponible %}
-            <p class="disponibilidad en-stock">● Disponible — {{ producto.existencias }} en stock</p>
+            <p class="disponibilidad en-stock">● {{ "Disponible"|traducir:request }} — {{ producto.existencias }} {{ "en stock"|traducir:request }}</p>
         {% else %}
-            <p class="disponibilidad sin-stock">● Producto agotado</p>
+            <p class="disponibilidad sin-stock">● {{ "Producto agotado"|traducir:request }}</p>
         {% endif %}
 
         <div style="display:flex;gap:12px;align-items:center;margin-top:20px;">
@@ -60,10 +61,10 @@
                 <form action="{% url 'carrito:agregar' producto.id %}" method="post" class="form-agregar" style="flex:1;margin:0;">
                     {% csrf_token %}
                     <input type="number" name="cantidad" value="1" min="1" max="{{ producto.existencias }}">
-                    <button type="submit" class="btn btn-oro">Agregar al carrito</button>
+                    <button type="submit" class="btn btn-oro">{{ "Agregar al carrito"|traducir:request }}</button>
                 </form>
             {% else %}
-                <button class="btn btn-oro desactivado" disabled style="flex:1;">Agotado</button>
+                <button class="btn btn-oro desactivado" disabled style="flex:1;">{{ "Agotado"|traducir:request }}</button>
             {% endif %}
 
             {% if user.is_authenticated %}
@@ -84,23 +85,23 @@
 
         <ul class="atributos">
             {% if producto.categoria %}
-                <li><span class="etiqueta-attr">Categoría</span> <span>{{ producto.categoria.nombre }}</span></li>
+                <li><span class="etiqueta-attr">{{ "Categoría"|traducir:request }}</span> <span>{{ producto.categoria.nombre|traducir:request }}</span></li>
             {% endif %}
             {% if producto.material %}
-                <li><span class="etiqueta-attr">Material</span> <span>{{ producto.material.nombre }}</span></li>
+                <li><span class="etiqueta-attr">{{ "Material"|traducir:request }}</span> <span>{{ producto.material.nombre|traducir:request }}</span></li>
             {% endif %}
             {% if producto.coleccion %}
                 <li>
-                    <span class="etiqueta-attr">Colección</span>
-                    <span><a href="{{ producto.coleccion.get_absolute_url }}" style="color:var(--lilac-deep);">{{ producto.coleccion.nombre }}</a></span>
+                    <span class="etiqueta-attr">{{ "Colección"|traducir:request }}</span>
+                    <span><a href="{{ producto.coleccion.get_absolute_url }}" style="color:var(--lilac-deep);">{{ producto.coleccion.nombre|traducir:request }}</a></span>
                 </li>
             {% endif %}
-            <li><span class="etiqueta-attr">Disponibilidad</span> <span>{% if producto.disponible %}En stock{% else %}Agotado{% endif %}</span></li>
+            <li><span class="etiqueta-attr">{{ "Disponibilidad"|traducir:request }}</span> <span>{% if producto.disponible %}{{ "En stock"|traducir:request }}{% else %}{{ "Agotado"|traducir:request }}{% endif %}</span></li>
         </ul>
 
         {% if producto.descripcion %}
-            <h3 style="font-size:1.1rem;margin:28px 0 10px;">Descripción</h3>
-            <div class="descripcion-producto">{{ producto.descripcion|linebreaks }}</div>
+            <h3 style="font-size:1.1rem;margin:28px 0 10px;">{{ "Descripción"|traducir:request }}</h3>
+            <div class="descripcion-producto">{{ producto.descripcion|traducir:request|linebreaks }}</div>
         {% endif %}
     </div>
 </div>
