@@ -142,8 +142,19 @@ def detalle_pedido(request, pedido_id):
         usuario=request.user
     )
 
+    # Pedidos del usuario ordenados del más antiguo al más reciente
+    pedidos_usuario = Pedido.objects.filter(
+        usuario=request.user
+    ).order_by('creado', 'id')
+
+    # Número del pedido para este usuario
+    numero_pedido = list(
+        pedidos_usuario.values_list('id', flat=True)
+    ).index(pedido.id) + 1
+
     return render(request, 'pedidos/detalle_pedido.html', {
         'pedido': pedido,
+        'numero_pedido': numero_pedido,
         'paypal_configurado': settings.PAYPAL_CONFIGURADO,
         'paypal_client_id': settings.PAYPAL_CLIENT_ID,
         'paypal_currency': settings.PAYPAL_CURRENCY,

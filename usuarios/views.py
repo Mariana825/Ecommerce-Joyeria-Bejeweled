@@ -87,10 +87,23 @@ def eliminar_direccion(request, pk):
         return redirect('usuarios:direcciones')
     return render(request, 'usuarios/direccion_confirmar_eliminar.html', {'direccion': direccion})
 
-
 @login_required
 def historial_pedidos(request):
     # Import local para evitar dependencia circular entre apps.
     from pedidos.models import Pedido
-    pedidos = Pedido.objects.filter(usuario=request.user).order_by('-creado')
-    return render(request, 'usuarios/historial_pedidos.html', {'pedidos': pedidos})
+
+    pedidos = list(
+        Pedido.objects.filter(
+            usuario=request.user
+        ).order_by('creado', 'id')
+    )
+
+    # Número de pedido visible para este usuario.
+    for numero, pedido in enumerate(pedidos, start=1):
+        pedido.numero_pedido = numero
+
+    return render(
+        request,
+        'usuarios/historial_pedidos.html',
+        {'pedidos': pedidos}
+    )

@@ -1,0 +1,19 @@
+{% autoescape off %}Hola {{ usuario.first_name|default:usuario.username }},
+
+¡Gracias por tu compra en Bejeweled! Recibimos el pago de tu pedido #{{ numero_pedido.pk }}.
+
+Artículos:
+{% for item in items %}- {{ item.cantidad }} x {{ item.nombre_producto }} (${{ item.precio_unitario|floatformat:2 }} c/u) = ${{ item.subtotal|floatformat:2 }}
+{% endfor %}
+Total: ${{ total|floatformat:2 }}
+Estado: {{ pedido.get_estado_display }}
+
+Enviaremos tu pedido a:
+{{ pedido.nombre_destinatario }}
+{{ pedido.calle }} {{ pedido.numero }}{% if pedido.colonia %}, {{ pedido.colonia }}{% endif %}
+{{ pedido.ciudad }}, {{ pedido.estado_direccion }}, C.P. {{ pedido.codigo_postal }}
+{{ pedido.pais }}{% if pedido.telefono_contacto %}
+Tel: {{ pedido.telefono_contacto }}{% endif %}
+
+Gracias por elegir Bejeweled.
+{% endautoescape %}

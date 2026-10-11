@@ -43,32 +43,70 @@ def enviar_mensaje(request):
         return JsonResponse({'error': 'Solicitud inválida.'}, status=400)
 
     texto = (datos.get('mensaje') or '').strip()
+
     if not texto:
         return JsonResponse({'error': 'Escribe un mensaje.'}, status=400)
+
     if len(texto) > LIMITE_MENSAJE:
         texto = texto[:LIMITE_MENSAJE]
 
     conversacion = _conversacion_de_la_sesion(request)
-    Mensaje.objects.create(conversacion=conversacion, rol=Mensaje.Rol.USUARIO, contenido=texto)
 
-    # Reenviamos como contexto solo los últimos N mensajes (ver settings),
-    # para no dejar crecer el costo de cada llamada sin límite.
+    Mensaje.objects.create(
+        conversacion=conversacion,
+        rol=Mensaje.Rol.USUARIO,
+        contenido=texto
+    )
+
+    # Recuperamos los últimos mensajes para mantener el contexto
+    # de la conversación.
     recientes = list(
-        conversacion.mensajes.order_by('-creado')[:settings.CHATBOT_HISTORIAL_MAXIMO]
+        conversacion.mensajes
+        .order_by('-creado')[:settings.CHATBOT_HISTORIAL_MAXIMO]
     )[::-1]
 
-    # La API de Gemini exige que el primer mensaje sea de rol "user": si el
-    # recorte anterior dejó el historial empezando en "assistant", quitamos
-    # ese primer mensaje suelto para no romper la alternancia user/assistant.
+    # Gemini debe recibir primero un mensaje del usuario.
     if recientes and recientes[0].rol != Mensaje.Rol.USUARIO:
         recientes = recientes[1:]
 
-    historial_api = [{'role': m.rol, 'content': m.contenido} for m in recientes]
+    historial_api = [
+        {
+            'role': m.rol,
+            'content': m.contenido
+        }
+        for m in recientes
+    ]
 
-    texto_respuesta = responder(historial_api, idioma=idioma_actual(request))
-
-    Mensaje.objects.create(
-        conversacion=conversacion, rol=Mensaje.Rol.ASISTENTE, contenido=texto_respuesta
+    # Gemini responde con:
+    #
+    # {
+    #     'texto': '...',
+    #     'productos': [...]
+    # }
+    resultado = responder(
+        historial_api,
+        idioma=idioma_actual(request)
     )
 
-    return JsonResponse({'respuesta': texto_respuesta})
+    texto_respuesta = resultado.get(
+        'texto',
+        'No pude generar una respuesta en este momento.'
+    )
+
+    productos = resultado.get(
+        'productos',
+        []
+    )
+
+    # Guardamos solamente el texto en el historial.
+    # No guardamos el JSON de productos dentro del mensaje.
+    Mensaje.objects.create(
+        conversacion=conversacion,
+        rol=Mensaje.Rol.ASISTENTE,
+        contenido=texto_respuesta
+    )
+
+    return JsonResponse({
+        'respuesta': texto_respuesta,
+        'productos': productos,
+    })

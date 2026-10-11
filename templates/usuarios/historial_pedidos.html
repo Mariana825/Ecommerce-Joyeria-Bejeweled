@@ -24,7 +24,7 @@
         <tbody>
             {% for pedido in pedidos %}
                 <tr>
-                    <td><strong>#{{ pedido.id }}</strong></td>
+                   <td><strong>#{{ pedido.numero_pedido }}</strong></td>
                     <td>{{ pedido.creado|date:"d/m/Y H:i" }}</td>
                     <td><span class="estado-pedido estado-{{ pedido.estado }}">{{ pedido.get_estado_display|traducir:request }}</span></td>
                     <td class="precio">${{ pedido.total|floatformat:2 }}</td>

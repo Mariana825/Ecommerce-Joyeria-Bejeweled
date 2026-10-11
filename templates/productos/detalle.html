@@ -150,13 +150,20 @@
                     <p style="font-size:0.85rem;line-height:1.8;font-weight:300;color:var(--muted-foreground);">{{ resena_propia.comentario }}</p>
                     <p style="font-size:0.72rem;color:var(--muted-foreground);">Ya escribiste una reseña para esta pieza.</p>
                 {% else %}
-                    <h3 style="font-size:1.2rem;margin:0 0 20px;">Escribe una reseña</h3>
-                    <form action="{% url 'productos:crear_resena' producto.id %}" method="post">
-                        {% csrf_token %}
-                        {{ form_resena.as_p }}
-                        <button type="submit" class="btn btn-primario">Publicar reseña</button>
-                    </form>
-                {% endif %}
+    {% if puede_resenar %}
+        <h3 style="font-size:1.2rem;margin:0 0 20px;">Escribe una reseña</h3>
+        <form action="{% url 'productos:crear_resena' producto.id %}" method="post">
+            {% csrf_token %}
+            {{ form_resena.as_p }}
+            <button type="submit" class="btn btn-primario">Publicar reseña</button>
+        </form>
+    {% else %}
+        <h3 style="font-size:1.2rem;margin:0 0 12px;">Compra el producto para reseñarlo</h3>
+        <p style="font-size:0.85rem;color:var(--muted-foreground);font-weight:300;line-height:1.8;">
+            Solo las personas que hayan comprado esta pieza pueden dejar una reseña.
+        </p>
+    {% endif %}
+{% endif %}
             {% else %}
                 <h3 style="font-size:1.2rem;margin:0 0 12px;">¿Ya la compraste?</h3>
                 <p style="font-size:0.85rem;color:var(--muted-foreground);font-weight:300;line-height:1.8;">

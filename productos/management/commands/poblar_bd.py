@@ -20,6 +20,7 @@ from pathlib import Path
 
 from django.contrib.auth.models import User
 from django.core.files import File
+import requests
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
@@ -37,6 +38,67 @@ from usuarios.models import DireccionEnvio
 USUARIO_PRUEBA = 'mariana'
 PASSWORD_PRUEBA = 'joyeria2026'
 
+IMAGENES_PRODUCTOS = {
+    'Anillo Solitario Lumière':
+        'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80',
+
+    'Anillo Trenzado Vienne':
+        'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80',
+
+    'Anillo Eternity Dorado':
+        'https://images.unsplash.com/photo-1602751584547-6d181d3d1c14?w=800&q=80',
+
+    'Anillo Sello Clásico':
+        'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80',
+
+    'Anillo Minimal Acero':
+        'https://images.unsplash.com/photo-1611955167811-4711904bb9f8?w=800&q=80',
+
+    'Collar Cadena Veneciana':
+        'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=800&q=80',
+
+    'Gargantilla Minimalista':
+        'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&q=80',
+
+    'Collar Eternal Rose':
+        'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=800&q=80',
+
+    'Collar Perla Solitaria':
+        'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80',
+
+    'Collar Capas Doradas':
+        'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80',
+
+    'Pulsera Tenis Céleste':
+        'https://images.unsplash.com/photo-1602751584547-6d181d3d1c14?w=800&q=80',
+
+    'Pulsera de Eslabones':
+        'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80',
+
+    'Pulsera Soleil':
+        'https://images.unsplash.com/photo-1611955167811-4711904bb9f8?w=800&q=80',
+
+    'Esclava Grabable':
+        'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=800&q=80',
+
+    'Pulsera Hilo Rojo':
+        'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&q=80',
+
+    'Aretes Argolla Pequeños':
+        'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=800&q=80',
+
+    'Aretes Broquel Perla':
+        'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80',
+
+    'Aretes Céleste Aguamarina':
+        'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80',
+
+    'Dije Corazón Grabable':
+        'https://images.unsplash.com/photo-1602751584547-6d181d3d1c14?w=800&q=80',
+
+    'Dije Inicial Oro':
+        'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80',
+}
 
 class Command(BaseCommand):
     help = 'Llena la base de datos con datos de prueba para la tienda de joyas.'
@@ -261,22 +323,52 @@ class Command(BaseCommand):
         )
         return productos
 
+    
     def _asignar_imagen(self, producto, nombre):
         """
-        Asigna la imagen de producto correspondiente (generada de antemano,
-        una distinta para cada pieza — ver productos/fixtures/imagenes_productos/)
-        si el producto todavía no tiene una.
+        Descarga la imagen del producto desde Internet y la guarda
+        en imagen_principal.
         """
+
         if producto.imagen_principal:
             return
 
-        archivo = DIR_IMAGENES_PRODUCTOS / f'{slugify(nombre)}.jpg'
-        if not archivo.exists():
-            self.stdout.write(self.style.WARNING(f'  Sin imagen de prueba para "{nombre}" ({archivo.name})'))
+        url = IMAGENES_PRODUCTOS.get(nombre)
+
+        if not url:
+            self.stdout.write(
+                self.style.WARNING(
+                    f'  Sin URL de imagen para "{nombre}"'
+                )
+            )
             return
 
-        with archivo.open('rb') as f:
-            producto.imagen_principal.save(archivo.name, File(f), save=True)
+        try:
+            respuesta = requests.get(url, timeout=15)
+            respuesta.raise_for_status()
+
+            nombre_archivo = f'{slugify(nombre)}.jpg'
+
+            from io import BytesIO
+
+            producto.imagen_principal.save(
+                nombre_archivo,
+                File(BytesIO(respuesta.content)),
+                save=True,
+            )
+
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f'  Imagen descargada: {nombre}'
+                )
+            )
+
+        except requests.RequestException as error:
+            self.stdout.write(
+                self.style.WARNING(
+                    f'  No se pudo descargar la imagen de "{nombre}": {error}'
+                )
+            )
 
     # ------------------------------------------------------------------
     def _crear_usuario(self):

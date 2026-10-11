@@ -1,18 +1,19 @@
 {% extends 'base.html' %}
 {% load traducir_tags %}
 
-{% block titulo %}{{ "Pedido"|traducir:request }} #{{ pedido.id }} | Bejeweled{% endblock %}
+{% block titulo %}{{ "Pedido"|traducir:request }} #{{ numero_pedido }} | Bejeweled{% endblock %}
 {% block newsletter %}{% endblock %}
 
 {% block contenido %}
 <p class="migas">
     <a href="{% url 'productos:inicio' %}">{{ "Inicio"|traducir:request }}</a> ·
     <a href="{% url 'usuarios:historial_pedidos' %}">{{ "Mis pedidos"|traducir:request }}</a> ·
-    {{ "Pedido"|traducir:request }} #{{ pedido.id }}
+    {{ "Pedido"|traducir:request }} #{{ numero_pedido }}
 </p>
 
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:32px;">
-    <h1 style="font-size:2rem;margin:0;">{{ "Pedido"|traducir:request }} #{{ pedido.id }}</h1>
+    <h1 style="font-size:2rem;margin:0;">
+    {{ "Pedido"|traducir:request }} #{{ numero_pedido }}</h1>
     <span class="estado-pedido estado-{{ pedido.estado }}">{{ pedido.get_estado_display|traducir:request }}</span>
 </div>
 

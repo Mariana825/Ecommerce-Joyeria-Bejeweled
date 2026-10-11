@@ -67,7 +67,59 @@ es verdadero (ver base.html). Habla con /chatbot/mensaje/ y /chatbot/historial/.
         lista.scrollTop = lista.scrollHeight;
         return burbujaMsg;
     }
+function agregarProductos(productos) {
+    if (!productos || !productos.length) return;
 
+    const contenedor = document.createElement('div');
+    contenedor.className = 'chat-productos';
+
+    productos.forEach(function (producto) {
+        const tarjeta = document.createElement('div');
+        tarjeta.className = 'chat-producto';
+
+        const imagen = producto.imagen
+            ? `<img src="${escaparHtml(producto.imagen)}"
+                    alt="${escaparHtml(producto.nombre)}"
+                    class="chat-producto-imagen">`
+            : `<div class="chat-producto-sin-imagen">
+                    Sin imagen
+               </div>`;
+
+        const disponibilidad = producto.disponible
+            ? ''
+            : '<span class="chat-producto-agotado">Agotado</span>';
+
+        tarjeta.innerHTML = `
+            ${imagen}
+
+            <div class="chat-producto-info">
+                <h4>${escaparHtml(producto.nombre)}</h4>
+
+                <p class="chat-producto-precio">
+                    $${escaparHtml(producto.precio)} MXN
+                </p>
+
+                ${producto.material
+                    ? `<p class="chat-producto-material">
+                            ${escaparHtml(producto.material)}
+                       </p>`
+                    : ''
+                }
+                ${disponibilidad}
+
+                <a href="${escaparHtml(producto.url)}"
+                   class="chat-producto-boton">
+                    Ver producto
+                </a>
+            </div>
+        `;
+
+        contenedor.appendChild(tarjeta);
+    });
+
+    lista.appendChild(contenedor);
+    lista.scrollTop = lista.scrollHeight;
+}
     function mostrarEscribiendo() {
         const indicador = document.createElement('div');
         indicador.className = 'chat-burbuja chat-burbuja-bot chat-escribiendo';
@@ -131,8 +183,12 @@ es verdadero (ver base.html). Habla con /chatbot/mensaje/ y /chatbot/historial/.
             if (datos.error) {
                 agregarBurbuja('{{ "Ocurrió un error. Intenta de nuevo."|traducir:request|escapejs }}', false);
             } else {
-                agregarBurbuja(datos.respuesta, false);
-            }
+    agregarBurbuja(datos.respuesta, false);
+
+    if (datos.productos && datos.productos.length) {
+        agregarProductos(datos.productos);
+    }
+}
         })
         .catch(function () {
             quitarEscribiendo();

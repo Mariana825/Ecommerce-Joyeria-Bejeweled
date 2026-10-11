@@ -1,0 +1,44 @@
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; color: #333;">
+  <h2>¡Gracias por tu compra, {{ usuario.first_name|default:usuario.username }}!</h2>
+  <p>Recibimos el pago de tu pedido <strong>#{{ numero_pedido.pk }}</strong>.</p>
+
+  <table style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr style="border-bottom: 2px solid #ddd; text-align: left;">
+        <th style="padding: 8px;">Producto</th>
+        <th style="padding: 8px;">Cant.</th>
+        <th style="padding: 8px; text-align: right;">Precio</th>
+        <th style="padding: 8px; text-align: right;">Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 8px;">{{ item.nombre_producto }}</td>
+        <td style="padding: 8px;">{{ item.cantidad }}</td>
+        <td style="padding: 8px; text-align: right;">${{ item.precio_unitario|floatformat:2 }}</td>
+        <td style="padding: 8px; text-align: right;">${{ item.subtotal|floatformat:2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="3" style="padding: 8px; text-align: right;"><strong>Total</strong></td>
+        <td style="padding: 8px; text-align: right;"><strong>${{ total|floatformat:2 }}</strong></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p><strong>Estado:</strong> {{ pedido.get_estado_display }}</p>
+
+  <h3>Dirección de envío</h3>
+  <p>
+    {{ pedido.nombre_destinatario }}<br>
+    {{ pedido.calle }} {{ pedido.numero }}{% if pedido.colonia %}, {{ pedido.colonia }}{% endif %}<br>
+    {{ pedido.ciudad }}, {{ pedido.estado_direccion }}, C.P. {{ pedido.codigo_postal }}<br>
+    {{ pedido.pais }}
+    {% if pedido.telefono_contacto %}<br>Tel: {{ pedido.telefono_contacto }}{% endif %}
+  </p>
+
+  <p>Gracias por elegir Bejeweled.</p>
+</div>

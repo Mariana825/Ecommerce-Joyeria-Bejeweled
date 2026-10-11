@@ -1,0 +1,8 @@
+{% autoescape off %}Novedad en Bejeweled: {{ producto.nombre }}
+
+Precio: ${{ producto.precio|floatformat:2 }}
+
+Míralo en el catálogo: {{ url_catalogo }}
+
+Si ya no quieres recibir estos avisos: {{ url_baja }}
+{% endautoescape %}

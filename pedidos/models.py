@@ -5,6 +5,7 @@ from productos.models import Producto
 from usuarios.models import DireccionEnvio
 
 
+    
 class Pedido(models.Model):
     class Estado(models.TextChoices):
         PENDIENTE_PAGO = 'pendiente_pago', 'Pendiente de pago'
@@ -35,8 +36,7 @@ class Pedido(models.Model):
 
     estado = models.CharField(max_length=20, choices=Estado.choices, default=Estado.PENDIENTE_PAGO)
 
-    # Método y referencia de pago: se completará al integrar la API de
-    # PayPal. Por ahora el pedido se crea y queda pendiente de pago.
+    
     metodo_pago = models.CharField(max_length=50, blank=True, default='')
     referencia_pago = models.CharField(max_length=100, blank=True, default='')
 

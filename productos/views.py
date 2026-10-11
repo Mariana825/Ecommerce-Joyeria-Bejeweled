@@ -1,12 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core import signing
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from .emails import SAL_BAJA
 from .forms import ResenaForm, SuscriptorForm
 from .models import Categoria, Coleccion, Favorito, Material, Producto, Suscriptor
+from pedidos.models import PedidoItem
 
 
 def _ids_favoritos(request):
@@ -117,6 +120,7 @@ def detalle(request, slug):
         Producto.objects.select_related('categoria', 'material', 'coleccion'),
         slug=slug, activo=True,
     )
+
     relacionados = Producto.objects.filter(
         categoria=producto.categoria, activo=True
     ).exclude(pk=producto.pk)[:4]
@@ -125,20 +129,36 @@ def detalle(request, slug):
 
     # ¿El usuario ya reseñó este producto?
     resena_propia = None
+
+    # ¿El usuario compró este producto en un pedido pagado?
+    puede_resenar = False
+
     if request.user.is_authenticated:
-        resena_propia = producto.resenas.filter(usuario=request.user).first()
+        resena_propia = producto.resenas.filter(
+            usuario=request.user
+        ).first()
+
+        puede_resenar = PedidoItem.objects.filter(
+            pedido__usuario=request.user,
+            pedido__estado='pagado',
+            producto=producto
+        ).exists()
 
     contexto = {
         'producto': producto,
         'relacionados': relacionados,
         'resenas': resenas,
         'resena_propia': resena_propia,
-        'form_resena': ResenaForm() if not resena_propia else None,
+        'puede_resenar': puede_resenar,
+        'form_resena': (
+            ResenaForm()
+            if puede_resenar and not resena_propia
+            else None
+        ),
         'favoritos_ids': _ids_favoritos(request),
     }
+
     return render(request, 'productos/detalle.html', contexto)
-
-
 # ============================================================
 #  Colecciones
 # ============================================================
@@ -221,9 +241,14 @@ def crear_resena(request, producto_id):
 @require_POST
 def suscribir_newsletter(request):
     email = request.POST.get('email', '').strip()
+    suscriptor = Suscriptor.objects.filter(email__iexact=email).first()
 
-    if Suscriptor.objects.filter(email=email).exists():
+    if suscriptor and suscriptor.activo:
         messages.info(request, 'Ese correo ya está suscrito a nuestro boletín.')
+    elif suscriptor:
+        suscriptor.activo = True
+        suscriptor.save(update_fields=['activo'])
+        messages.success(request, '¡Listo! Volviste a suscribirte a nuestro boletín.')
     else:
         form = SuscriptorForm(request.POST)
         if form.is_valid():
@@ -233,3 +258,14 @@ def suscribir_newsletter(request):
             messages.error(request, 'Ingresa un correo electrónico válido.')
 
     return redirect(request.POST.get('siguiente') or 'productos:inicio')
+
+def newsletter_baja(request, token):
+    try:
+        email = signing.loads(token, salt=SAL_BAJA)
+    except signing.BadSignature:
+        messages.error(request, 'El enlace de baja no es válido.')
+        return redirect('productos:catalogo')
+
+    Suscriptor.objects.filter(email=email).update(activo=False)
+    messages.info(request, 'Te diste de baja del boletín.')
+    return redirect('productos:catalogo')

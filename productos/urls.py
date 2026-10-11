@@ -21,5 +21,8 @@ urlpatterns = [
     path('resena/<int:producto_id>/', views.crear_resena, name='crear_resena'),
 
     # Newsletter
+    
     path('newsletter/', views.suscribir_newsletter, name='newsletter'),
+    path('newsletter/baja/<str:token>/', views.newsletter_baja, name='newsletter_baja'),
+    
 ]
