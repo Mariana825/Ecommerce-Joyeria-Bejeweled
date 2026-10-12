@@ -23,6 +23,9 @@ from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils.text import slugify
 
+import os
+from django.contrib.auth import get_user_model
+
 from pedidos.models import Pedido, PedidoItem
 from productos.models import (
     Categoria, Coleccion, Favorito, Material, Producto, Resena, Suscriptor,
@@ -92,6 +95,7 @@ class Command(BaseCommand):
         if opciones['limpiar']:
             self._limpiar()
 
+        self._crear_superusuario()  
         categorias = self._crear_categorias()
         materiales = self._crear_materiales()
         colecciones = self._crear_colecciones()
@@ -533,7 +537,27 @@ class Command(BaseCommand):
 
         self.stdout.write(f'  Usuario: {usuario.username} (con {len(direcciones)} direcciones)')
         return usuario, direcciones
+                
+    def _crear_superusuario(self):
+            User = get_user_model()
+            username = os.environ.get('ADMIN_USERNAME', 'admin')
+            email = os.environ.get('ADMIN_EMAIL', 'admin@test.com')
+            password = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
+            usuario, creado = User.objects.get_or_create(
+                username=username,
+                defaults={'email': email},
+            )
+            usuario.email = email
+            usuario.is_staff = True
+            usuario.is_superuser = True
+            usuario.is_active = True
+            usuario.set_password(password)
+            usuario.save()
+
+            estado = 'creado' if creado else 'actualizado'
+            self.stdout.write(f'  Superusuario {estado}: {username}')
+            return usuario
     # ------------------------------------------------------------------
     def _crear_resenas(self, usuario, productos):
         # Un usuario solo puede resenar cada producto una vez, asi que cada

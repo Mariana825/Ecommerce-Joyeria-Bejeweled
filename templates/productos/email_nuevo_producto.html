@@ -1,11 +1,51 @@
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; color: #333;">
-  <h2>Novedad en Bejeweled</h2>
-  <p><strong>{{ producto.nombre }}</strong></p>
-  <p>Precio: ${{ producto.precio|floatformat:2 }}</p>
-  <p><a href="{{ url_catalogo }}">Verlo en el catálogo</a></p>
-  <hr>
-  <p style="font-size: 12px; color: #888;">
-    <a href="{{ url_baja }}">Darme de baja del boletín</a>
-  </p>
-</div>
+<!DOCTYPE html>
+<html lang="es">
+<body style="margin:0;padding:0;background:#f4f1ea;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ea;padding:32px 12px;">
+  <tr><td align="center">
+    <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:6px;overflow:hidden;">
 
+      <tr><td align="center" style="background:#1a1a1a;padding:26px 20px;">
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;letter-spacing:6px;color:#C9A84C;">BEJEWELED</div>
+        <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:3px;color:#bdbdbd;margin-top:6px;">JOYERÍA FINA</div>
+      </td></tr>
+
+      <tr><td align="center" style="padding:34px 30px 6px;">
+        <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:3px;color:#C9A84C;">NOVEDAD</div>
+        <h1 style="font-family:Georgia,serif;font-weight:normal;font-size:28px;color:#1a1a1a;margin:10px 0 0;">{{ producto.nombre }}</h1>
+      </td></tr>
+
+      {% if tiene_imagen %}
+      <tr><td align="center" style="padding:22px 30px 0;">
+        <a href="{{ url_producto }}">
+          <img src="cid:producto_img" alt="{{ producto.nombre }}" width="500" style="display:block;max-width:100%;height:auto;border-radius:4px;">
+        </a>
+      </td></tr>
+      {% endif %}
+
+      {% if producto.descripcion %}
+      <tr><td align="center" style="padding:20px 40px 0;font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#555555;">
+        {{ producto.descripcion|truncatewords:30 }}
+      </td></tr>
+      {% endif %}
+
+      <tr><td align="center" style="padding:18px 30px 0;font-family:Georgia,serif;font-size:22px;color:#1a1a1a;">
+        ${{ producto.precio|floatformat:2 }}
+      </td></tr>
+
+      <tr><td align="center" style="padding:26px 30px 36px;">
+        <a href="{{ url_producto }}" style="display:inline-block;background:#C9A84C;color:#1a1a1a;text-decoration:none;font-family:Arial,sans-serif;font-size:13px;letter-spacing:2px;padding:14px 34px;border-radius:2px;">
+          VER PIEZA
+        </a>
+      </td></tr>
+
+      <tr><td align="center" style="background:#faf8f3;padding:20px 30px;font-family:Arial,sans-serif;font-size:11px;color:#999999;line-height:1.6;">
+        Recibes este correo porque te suscribiste al boletín de Bejeweled.<br>
+        <a href="{{ url_baja }}" style="color:#999999;">Darme de baja del boletín</a>
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>

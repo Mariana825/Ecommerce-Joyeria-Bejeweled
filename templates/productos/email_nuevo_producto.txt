@@ -2,7 +2,7 @@
 
 Precio: ${{ producto.precio|floatformat:2 }}
 
-Míralo en el catálogo: {{ url_catalogo }}
+Míralo aquí: {{ url_producto }}
 
 Si ya no quieres recibir estos avisos: {{ url_baja }}
 {% endautoescape %}

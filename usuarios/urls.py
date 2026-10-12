@@ -16,6 +16,7 @@ urlpatterns = [
     path('contrasena/recuperar/', auth_views.PasswordResetView.as_view(
         template_name='usuarios/contrasena_recuperar.html',
         email_template_name='usuarios/contrasena_email.html',
+        html_email_template_name='usuarios/contrasena_email_html.html',
         subject_template_name='usuarios/contrasena_asunto.txt',
         success_url='/cuenta/contrasena/recuperar/enviado/',
         extra_email_context={'site_url': settings.SITE_URL},
