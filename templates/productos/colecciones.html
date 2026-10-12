@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% load traducir_tags %}
-
+{% load static %}
 {% block titulo %}
     {{ "Colecciones | Bejeweled"|traducir:request }}
 {% endblock %}
 
 {% block contenido %}
+
 
 <div class="seccion-titulo">
 
@@ -34,21 +35,18 @@
             <a href="{{ coleccion.get_absolute_url }}" class="tarjeta-coleccion">
 
                 {% if coleccion.imagen %}
-
-                    <img
-                        src="{{ coleccion.imagen.url }}"
-                        alt="{{ coleccion.nombre|traducir:request }}"
-                    >
-
+                <img
+                    src="{{ coleccion.imagen.url }}"
+                    alt="{{ coleccion.nombre|traducir:request }}"
+                    loading="lazy"
+                >
                 {% else %}
-
                     <img
-                        src="https://images.unsplash.com/photo-1611107683227-e9060eccd846?w=800&h=500&fit=crop&auto=format"
+                        src="{% get_media_prefix %}productos/coleccion-default.jpg"
                         alt="{{ coleccion.nombre|traducir:request }}"
+                        loading="lazy"
                     >
-
                 {% endif %}
-
                 <div
                     class="franja"
                     style="background: {{ coleccion.color_acento }};"

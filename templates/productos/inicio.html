@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load traducir_tags %}
+{% load static %}
 {% block titulo %}Bejeweled — Joyería Fina{% endblock %}
 
 {% block cuerpo %}
@@ -62,36 +63,34 @@
         {% if categorias %}
             <div class="grid-categorias">
                 {% for categoria in categorias %}
-                    <a href="{% url 'productos:catalogo' %}?categoria={{ categoria.slug }}" class="tarjeta-categoria">
-                        {% if categoria.imagen %}
-    <img src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}">
-{% else %}
-    {% if "anillo" in categoria.nombre|lower %}
-        <img src="https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=600&h=700&fit=crop&auto=format"
-             alt="{{ categoria.nombre }}">
-    {% elif "collar" in categoria.nombre|lower %}
-        <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=600&h=700&fit=crop&auto=format"
-             alt="{{ categoria.nombre }}">
-    {% elif "pulsera" in categoria.nombre|lower %}
-        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=600&h=700&fit=crop&auto=format"
-             alt="{{ categoria.nombre }}">
-    {% elif "arete" in categoria.nombre|lower %}
-        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=700&fit=crop&auto=format"
-             alt="{{ categoria.nombre }}">
-    {% elif "dije" in categoria.nombre|lower %}
-        <img src="https://images.unsplash.com/photo-1602751584552-8ba73aad10e1?w=600&h=700&fit=crop&auto=format"
-             alt="{{ categoria.nombre }}">
-    {% else %}
-        <img src="https://images.unsplash.com/photo-1588444650733-d0767b753fc8?w=600&h=700&fit=crop&auto=format"
-             alt="{{ categoria.nombre }}">
-    {% endif %}
-{% endif %}
-                        <div class="info">
-                            <h3>{{ categoria.nombre|traducir:request }}</h3>
-                            <span>{{ categoria.productos.count }} {{ "pieza"|traducir:request }}{{ categoria.productos.count|pluralize:"s" }}</span>
-                        </div>
-                    </a>
-                {% endfor %}
+    <a href="{% url 'productos:catalogo' %}?categoria={{ categoria.slug }}" class="tarjeta-categoria">
+
+        {% if categoria.imagen %}
+            <img src="{{ categoria.imagen.url }}" alt="{{ categoria.nombre }}" loading="lazy">
+        {% else %}
+            {% with nombre=categoria.nombre|lower %}
+                {% if "anillo" in nombre %}
+                    <img src="{% get_media_prefix %}productos/anillos.jpg" alt="{{ categoria.nombre }}" loading="lazy">
+                {% elif "collar" in nombre %}
+                    <img src="{% get_media_prefix %}productos/collares.jpg" alt="{{ categoria.nombre }}" loading="lazy">
+                {% elif "pulsera" in nombre %}
+                    <img src="{% get_media_prefix %}productos/pulseras.jpg" alt="{{ categoria.nombre }}" loading="lazy">
+                {% elif "arete" in nombre %}
+                    <img src="{% get_media_prefix %}productos/aretes.jpg" alt="{{ categoria.nombre }}" loading="lazy">
+                {% elif "dijes" in nombre %}
+                    <img src="{% get_media_prefix %}productos/dije.jpg" alt="{{ categoria.nombre }}" loading="lazy">
+                {% else %}
+                    <img src="{% get_media_prefix %}productos/coleccion-dorada.jpg" alt="{{ categoria.nombre }}" loading="lazy">
+                {% endif %}
+            {% endwith %}
+        {% endif %}
+
+        <div class="info">
+            <h3>{{ categoria.nombre|traducir:request }}</h3>
+            <span>{{ categoria.productos.count }} {{ "pieza"|traducir:request }}{{ categoria.productos.count|pluralize:"s" }}</span>
+        </div>
+    </a>
+{% endfor %}
             </div>
         {% else %}
             <div class="vacio">
@@ -136,7 +135,7 @@
     </div>
 </section>
 
-{# ══════════ COLECCIONES ══════════ #}
+
 {# ══════════ COLECCIONES ══════════ #}
 {% if colecciones %}
 <section class="seccion">

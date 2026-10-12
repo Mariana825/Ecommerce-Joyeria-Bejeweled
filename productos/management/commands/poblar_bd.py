@@ -1,18 +1,17 @@
 """
-Comando para llenar la base de datos con datos de prueba.
+Comando para llenar la base de datos con datos de prueba de la tienda Bejeweled.
 
 Uso:
-    python manage.py poblar_bd           # agrega los datos
-    python manage.py poblar_bd --limpiar # borra los datos de prueba y los vuelve a crear
+    python manage.py poblar_bd                         # crea o actualiza los datos
+    python manage.py poblar_bd --reemplazar-imagenes   # ademas cambia las fotos por las locales
+    python manage.py poblar_bd --limpiar               # borra TODO lo de prueba y lo recrea
 
-Crea:
-    - 5 categorías, 6 materiales, 4 colecciones
-    - 20 productos (con stock, agotados, destacados y nuevos), cada uno con
-      su propia imagen de producto (ver productos/fixtures/imagenes_productos/)
-    - 1 usuario de prueba con perfil y 2 direcciones
-    - 6 favoritos y 6 reseñas de ese usuario
-    - 1 pedido con 3 artículos
-    - 3 suscriptores al newsletter
+Imagenes:
+    Coloca una foto por producto en <app>/fixtures/imagenes_productos/ con el
+    nombre del producto en formato slug (anillo-solitario-lumiere.jpg, etc.).
+    Acepta .jpg, .jpeg, .png y .webp. Si falta alguna, el comando avisa con la
+    ruta exacta y el nombre de archivo que espera.
+
 """
 
 from decimal import Decimal
@@ -20,85 +19,50 @@ from pathlib import Path
 
 from django.contrib.auth.models import User
 from django.core.files import File
-import requests
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from django.utils import timezone
 from django.utils.text import slugify
 
 from pedidos.models import Pedido, PedidoItem
 from productos.models import (
     Categoria, Coleccion, Favorito, Material, Producto, Resena, Suscriptor,
 )
-
-DIR_IMAGENES_PRODUCTOS = Path(__file__).resolve().parent.parent.parent / 'fixtures' / 'imagenes_productos'
-
 from usuarios.models import DireccionEnvio
+
+DIR_IMAGENES_PRODUCTOS = (
+    Path(__file__).resolve().parent.parent.parent / 'fixtures' / 'imagenes_productos'
+)
+EXTENSIONES = ('.jpg', '.jpeg', '.png', '.webp')
 
 USUARIO_PRUEBA = 'mariana'
 PASSWORD_PRUEBA = 'joyeria2026'
 
-IMAGENES_PRODUCTOS = {
-    'Anillo Solitario Lumière':
-        'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80',
+# ---------------------------------------------------------------------------
+#  Textos de cuidados y armado de la ficha tecnica
+# ---------------------------------------------------------------------------
+CUIDADO_ORO = 'Evita el contacto prolongado con cloro y perfumes y límpiala con un paño suave.'
+CUIDADO_PLATA = ('Guárdala en una bolsa cerrada para que se oscurezca menos y límpiala '
+                 'con un paño para plata.')
+CUIDADO_BANO = ('El baño de oro se desgasta poco a poco con el roce, el agua, el sudor y los '
+                'perfumes: retírala para bañarte o hacer ejercicio y guárdala seca.')
+CUIDADO_PVD = ('Aunque el baño PVD resiste mejor el uso diario, evita productos abrasivos y '
+               'perfumes y límpiala con un paño suave.')
+CUIDADO_ACERO = 'Límpiala con agua tibia, jabón neutro y un paño suave.'
+CUIDADO_PERLA = ('Las perlas son delicadas: colócala después del perfume y las cremas, y '
+                 'límpiala con un paño suave y seco.')
 
-    'Anillo Trenzado Vienne':
-        'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80',
 
-    'Anillo Eternity Dorado':
-        'https://images.unsplash.com/photo-1602751584547-6d181d3d1c14?w=800&q=80',
+def ficha(resumen, base, acabado, piedra=None, medidas=None, cuidados=None):
+    """Arma la descripcion del producto con su ficha tecnica."""
+    lineas = [resumen, '', f'Material base: {base}', f'Acabado: {acabado}']
+    if piedra:
+        lineas.append(f'Piedra: {piedra}')
+    if medidas:
+        lineas.append(f'Medidas: {medidas}')
+    if cuidados:
+        lineas.append(f'Cuidados: {cuidados}')
+    return '\n'.join(lineas)
 
-    'Anillo Sello Clásico':
-        'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80',
-
-    'Anillo Minimal Acero':
-        'https://images.unsplash.com/photo-1611955167811-4711904bb9f8?w=800&q=80',
-
-    'Collar Cadena Veneciana':
-        'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=800&q=80',
-
-    'Gargantilla Minimalista':
-        'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&q=80',
-
-    'Collar Eternal Rose':
-        'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=800&q=80',
-
-    'Collar Perla Solitaria':
-        'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80',
-
-    'Collar Capas Doradas':
-        'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80',
-
-    'Pulsera Tenis Céleste':
-        'https://images.unsplash.com/photo-1602751584547-6d181d3d1c14?w=800&q=80',
-
-    'Pulsera de Eslabones':
-        'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80',
-
-    'Pulsera Soleil':
-        'https://images.unsplash.com/photo-1611955167811-4711904bb9f8?w=800&q=80',
-
-    'Esclava Grabable':
-        'https://images.unsplash.com/photo-1617038220319-276d3cfab638?w=800&q=80',
-
-    'Pulsera Hilo Rojo':
-        'https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=800&q=80',
-
-    'Aretes Argolla Pequeños':
-        'https://images.unsplash.com/photo-1596944924616-7b38e7cfac36?w=800&q=80',
-
-    'Aretes Broquel Perla':
-        'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80',
-
-    'Aretes Céleste Aguamarina':
-        'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80',
-
-    'Dije Corazón Grabable':
-        'https://images.unsplash.com/photo-1602751584547-6d181d3d1c14?w=800&q=80',
-
-    'Dije Inicial Oro':
-        'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80',
-}
 
 class Command(BaseCommand):
     help = 'Llena la base de datos con datos de prueba para la tienda de joyas.'
@@ -109,10 +73,22 @@ class Command(BaseCommand):
             action='store_true',
             help='Borra los datos de prueba antes de crearlos de nuevo.',
         )
+        parser.add_argument(
+            '--reemplazar-imagenes',
+            action='store_true',
+            dest='reemplazar_imagenes',
+            help='Reemplaza la foto de cada producto por la del disco '
+                 '(fixtures/imagenes_productos/<slug>.jpg).',
+        )
 
     # ------------------------------------------------------------------
     @transaction.atomic
     def handle(self, *args, **opciones):
+        self.reemplazar_imagenes = opciones['reemplazar_imagenes']
+        self.imagenes_faltantes = 0
+
+        self._silenciar_aviso_newsletter()
+
         if opciones['limpiar']:
             self._limpiar()
 
@@ -121,20 +97,26 @@ class Command(BaseCommand):
         colecciones = self._crear_colecciones()
         productos = self._crear_productos(categorias, materiales, colecciones)
         usuario, direcciones = self._crear_usuario()
-        self._crear_favoritos(usuario, productos)
         self._crear_resenas(usuario, productos)
-        self._crear_pedido(usuario, direcciones[0], productos)
-        self._crear_suscriptores()
 
-        self.stdout.write('')
-        self.stdout.write(self.style.SUCCESS('¡Base de datos poblada correctamente!'))
-        self.stdout.write('')
-        self.stdout.write(f'  Usuario de prueba : {USUARIO_PRUEBA}')
-        self.stdout.write(f'  Contraseña        : {PASSWORD_PRUEBA}')
-        self.stdout.write('')
-        self.stdout.write('  Tienda: http://127.0.0.1:8000/')
-        self.stdout.write('  Admin : http://127.0.0.1:8000/admin/')
-        self.stdout.write('')
+        if self.imagenes_faltantes:
+            self.stdout.write(self.style.WARNING(
+                f'\n  Faltan {self.imagenes_faltantes} imagen(es). Carpeta esperada:\n'
+                f'  {DIR_IMAGENES_PRODUCTOS}'
+            ))
+        self.stdout.write(self.style.SUCCESS(
+            f'\nListo. Usuario de prueba: {USUARIO_PRUEBA} / {PASSWORD_PRUEBA}'
+        ))
+
+    # ------------------------------------------------------------------
+    def _silenciar_aviso_newsletter(self):
+        """Evita que crear productos de prueba mande correos a los suscriptores."""
+        try:
+            from django.db.models.signals import post_save
+            from productos.signals import avisar_suscriptores
+            post_save.disconnect(avisar_suscriptores, sender=Producto)
+        except ImportError:
+            pass  # todavia no existe la senal del newsletter
 
     # ------------------------------------------------------------------
     def _limpiar(self):
@@ -155,9 +137,8 @@ class Command(BaseCommand):
 
     def _borrar_imagenes_productos(self):
         """
-        Borra del disco las imágenes que quedaron guardadas para los
-        productos de prueba, para que `--limpiar` sea repetible sin ir
-        acumulando copias con sufijos (imagen_abc123.jpg, imagen_xyz789.jpg...).
+        Borra del disco las imagenes de los productos para que `--limpiar` sea
+        repetible sin acumular copias con sufijos (imagen_abc123.jpg...).
         """
         for producto in Producto.objects.exclude(imagen_principal=''):
             producto.imagen_principal.delete(save=False)
@@ -173,7 +154,7 @@ class Command(BaseCommand):
         ]
         categorias = {}
         for nombre, descripcion in datos:
-            obj, creado = Categoria.objects.get_or_create(
+            obj, _ = Categoria.objects.get_or_create(
                 nombre=nombre, defaults={'descripcion': descripcion, 'activa': True}
             )
             categorias[nombre] = obj
@@ -182,8 +163,10 @@ class Command(BaseCommand):
 
     def _crear_materiales(self):
         nombres = [
-            'Oro 18k', 'Oro 14k', 'Oro blanco', 'Plata 925',
-            'Acero inoxidable', 'Chapa de oro',
+            'Oro amarillo 18k', 'Oro amarillo 14k', 'Oro blanco 18k', 'Oro blanco 14k',
+            'Plata 925', 'Plata 925 con baño de oro',
+            'Acero inoxidable 316L', 'Acero 316L con baño de oro (PVD)',
+            'Latón con baño de oro',
         ]
         materiales = {}
         for nombre in nombres:
@@ -195,122 +178,272 @@ class Command(BaseCommand):
     def _crear_colecciones(self):
         datos = [
             ('Colección Dorada',
-             'Piezas bañadas en oro 18K para quienes aprecian el lujo sin concesiones.',
-             '#C9A84C', 1),
+            'Piezas en tonos dorados: oro macizo de 14k y 18k, y opciones con baño de oro '
+            'para el uso diario.',
+            '#C9A84C', 1, 'productos/coleccion-dorada.jpg'),
             ('Elegancia en Plata',
-             'Diseños contemporáneos en plata esterlina 925. Sutileza redefinida.',
-             '#A8AAAD', 2),
+            'Diseños contemporáneos en plata 925, con baño de rodio y piedras naturales.',
+            '#A8AAAD', 2, 'productos/coleccion-plata.jpg'),
             ('Regalos Especiales',
-             'Curada con amor para momentos que merecen ser recordados eternamente.',
-             '#8A74A8', 3),
-            ('Novias 2026',
-             'Piezas pensadas para el día más importante: sobrias, luminosas y atemporales.',
-             '#E8D28A', 4),
+            'Curada con amor para momentos que merecen ser recordados: piezas para grabar, '
+            'dijes y detalles personales.',
+            '#8A74A8', 3, 'productos/coleccion-regalo.jpg'),
         ]
         colecciones = {}
-        for nombre, descripcion, color, orden in datos:
-            obj, _ = Coleccion.objects.get_or_create(
+        for nombre, descripcion, color, orden, imagen in datos:
+            obj, _ = Coleccion.objects.update_or_create(
                 nombre=nombre,
                 defaults={
                     'descripcion': descripcion,
                     'color_acento': color,
                     'orden': orden,
                     'activa': True,
+                    'imagen': imagen,
                 },
             )
             colecciones[nombre] = obj
         self.stdout.write(f'  Colecciones: {len(colecciones)}')
         return colecciones
 
-    # ------------------------------------------------------------------
+   
     def _crear_productos(self, cat, mat, col):
-        # (nombre, categoría, material, colección, precio, existencias,
-        #  destacado, es_nuevo, activo, descripción)
+        # (nombre, categoria, material, coleccion, precio, existencias,
+        #  destacado, es_nuevo, activo, descripcion)
         datos = [
-            ('Anillo Solitario Lumière', 'Anillos', 'Oro blanco', 'Novias 2026',
+            # ---------------- ANILLOS ----------------
+            ('Anillo Solitario Lumière', 'Anillos', 'Oro blanco 18k', None,
              '14900.00', 4, True, False, True,
-             'Anillo solitario en oro blanco de 18k con diamante de talla brillante. '
-             'El clásico absoluto para una pedida de mano.'),
+             ficha('Anillo solitario de líneas limpias con un diamante central de talla '
+                   'brillante sostenido por cuatro garras. Pensado para una pedida de mano, '
+                   'deja que la piedra sea la protagonista.',
+                   'Oro blanco de 18 quilates (750)',
+                   'Baño de rodio para un blanco más brillante y duradero',
+                   'Diamante natural de 0.30 ct, talla brillante',
+                   'Banda de 1.8 mm. Tallas 5 a 9',
+                   CUIDADO_ORO)),
             ('Anillo Trenzado Vienne', 'Anillos', 'Plata 925', 'Elegancia en Plata',
              '890.00', 24, False, True, True,
-             'Anillo de plata 925 con diseño trenzado a mano. Ligero y cómodo para uso diario.'),
-            ('Anillo Eternity Dorado', 'Anillos', 'Oro 18k', 'Colección Dorada',
+             ficha('Anillo de plata con una banda de tres hilos trenzados a mano, de aspecto '
+                   'artesanal y muy ligero. Se siente cómodo todo el día y combina bien con '
+                   'otros anillos finos.',
+                   'Plata 925 (92.5 % de plata pura)',
+                   'Baño de rodio para retrasar el deslustre',
+                   None,
+                   'Banda de 3 mm. Tallas 5 a 10',
+                   CUIDADO_PLATA)),
+            ('Anillo Eternity Dorado', 'Anillos', 'Oro amarillo 18k', 'Colección Dorada',
              '9800.00', 6, True, False, True,
-             'Banda completa de oro 18k con circonias engastadas en todo el contorno.'),
-            ('Anillo Sello Clásico', 'Anillos', 'Oro 14k', 'Colección Dorada',
+             ficha('Banda completa que recorre todo el contorno del dedo con circonias '
+                   'engastadas una junto a otra. Un anillo luminoso que sirve como alianza '
+                   'de boda o como regalo de aniversario.',
+                   'Oro amarillo de 18 quilates (750)',
+                   'Pulido de alto brillo (oro macizo, sin recubrimiento)',
+                   'Circonias cúbicas de 1.5 mm en engaste de garras compartidas',
+                   'Banda de 2 mm. Tallas 5 a 9',
+                   CUIDADO_ORO)),
+            ('Anillo Sello Clásico', 'Anillos', 'Oro amarillo 14k', 'Colección Dorada',
              '5400.00', 9, False, False, True,
-             'Anillo tipo sello en oro 14k, disponible para grabado personalizado.'),
-            ('Anillo Minimal Acero', 'Anillos', 'Acero inoxidable', None,
+             ficha('Anillo tipo sello de cara ovalada y brillo clásico, con espacio para '
+                   'grabar iniciales o un símbolo. Una pieza que se hereda y se usa en el '
+                   'meñique o en cualquier dedo.',
+                   'Oro amarillo de 14 quilates (585)',
+                   'Pulido (oro macizo, sin recubrimiento)',
+                   None,
+                   'Cara ovalada de 12 x 10 mm. Tallas 6 a 11',
+                   CUIDADO_ORO)),
+            ('Anillo Minimal Acero', 'Anillos', 'Acero inoxidable 316L', None,
              '390.00', 45, False, True, True,
-             'Anillo delgado de acero inoxidable, resistente al agua y al uso diario.'),
+             ficha('Anillo de banda delgada y diseño liso, pensado para el uso diario y para '
+                   'combinar con otros anillos. El acero inoxidable 316L soporta bien el '
+                   'contacto ocasional con el agua.',
+                   'Acero inoxidable 316L',
+                   'Pulido espejo; el color es el propio del acero, sin recubrimiento',
+                   None,
+                   'Banda de 2 mm. Tallas 5 a 11',
+                   CUIDADO_ACERO)),
 
-            ('Collar Cadena Veneciana', 'Collares', 'Oro 14k', 'Colección Dorada',
+            # ---------------- COLLARES ----------------
+            ('Collar Cadena Veneciana', 'Collares', 'Oro amarillo 14k', 'Colección Dorada',
              '6200.00', 10, True, False, True,
-             'Collar de oro 14k con tejido veneciano de 45 cm. Ligero, firme y elegante.'),
+             ficha('Collar de cadena veneciana de eslabones cuadrados, firme y con mucho '
+                   'brillo. Se usa solo o con un dije y es una pieza básica para toda la vida.',
+                   'Oro amarillo de 14 quilates (585)',
+                   'Pulido (oro macizo, sin recubrimiento)',
+                   None,
+                   'Largo de 45 cm, grosor de 1.2 mm, cierre de mosquetón',
+                   CUIDADO_ORO)),
             ('Gargantilla Minimalista', 'Collares', 'Plata 925', 'Elegancia en Plata',
              '1150.00', 18, False, True, True,
-             'Gargantilla de plata 925 con dije circular. Perfecta para combinar en capas.'),
-            ('Collar Eternal Rose', 'Collares', 'Oro 18k', 'Regalos Especiales',
+             ficha('Gargantilla fina con un pequeño dije circular que descansa justo en la '
+                   'clavícula. Es ligera y funciona muy bien para usar en capas con otros '
+                   'collares.',
+                   'Plata 925',
+                   'Baño de rodio',
+                   None,
+                   'Largo ajustable de 35 a 40 cm. Dije circular de 10 mm',
+                   CUIDADO_PLATA)),
+            ('Collar Eternal Rose', 'Collares', 'Oro amarillo 18k', 'Regalos Especiales',
              '12850.00', 3, True, False, True,
-             'Collar de oro 18k con dije en forma de rosa y rubí central. Pieza de edición limitada.'),
-            ('Collar Perla Solitaria', 'Collares', 'Oro blanco', 'Novias 2026',
+             ficha('Dije en forma de rosa con un rubí en el centro de la flor y los pétalos '
+                   'con textura satinada. Es una pieza de edición limitada pensada para '
+                   'regalar en una fecha importante.',
+                   'Oro amarillo de 18 quilates (750)',
+                   'Pulido en la cadena y satinado en los pétalos (sin recubrimiento)',
+                   'Rubí natural de 4 mm engastado al centro',
+                   'Dije de 14 mm. Cadena de 45 cm con cierre de mosquetón',
+                   CUIDADO_ORO)),
+            ('Collar Perla Solitaria', 'Collares', 'Oro blanco 14k', None,
              '4600.00', 7, False, False, True,
-             'Perla cultivada de agua dulce montada en cadena de oro blanco de 42 cm.'),
-            ('Collar Capas Doradas', 'Collares', 'Chapa de oro', None,
-             '760.00', 0, False, False, True,
-             'Set de tres cadenas de distinto largo en chapa de oro, listas para usar en capas.'),
+             ficha('Una sola perla cultivada de agua dulce, de tono blanco cremoso, montada '
+                   'sobre una cadena fina. Sobria y atemporal, es una opción clásica para '
+                   'el uso diario.',
+                   'Oro blanco de 14 quilates (585)',
+                   'Baño de rodio',
+                   'Perla cultivada de agua dulce de 8 mm',
+                   'Cadena de 42 cm con 3 cm de extensión',
+                   CUIDADO_PERLA)),
+            ('Collar Capas Doradas', 'Collares', 'Latón con baño de oro', 'Colección Dorada',
+             '760.00', 13, False, False, True,
+             ficha('Set de tres cadenas finas de distinto largo, pensadas para usarse juntas '
+                   'y lograr el efecto de capas sin tener que combinarlas tú. Una forma '
+                   'accesible de llevar el dorado.',
+                   'Latón',
+                   'Baño de oro de 18 quilates',
+                   None,
+                   'Tres cadenas de 36, 42 y 50 cm',
+                   CUIDADO_BANO)),
 
-            ('Pulsera Tenis Céleste', 'Pulseras', 'Oro blanco', 'Novias 2026',
+            # ---------------- PULSERAS ----------------
+            ('Pulsera Tenis Céleste', 'Pulseras', 'Oro blanco 14k', 'Regalos Especiales',
              '18400.00', 2, True, False, True,
-             'Pulsera tenis en oro blanco con circonias de corte brillante y broche de seguridad doble.'),
-            ('Pulsera de Eslabones', 'Pulseras', 'Acero inoxidable', None,
+             ficha('Pulsera tipo tenis con una línea continua de diamantes del mismo tamaño '
+                   'que atrapan la luz con cada movimiento. Es la pieza más lujosa de la '
+                   'colección',
+                   'Oro blanco de 14 quilates (585)',
+                   'Baño de rodio',
+                   'Diamantes cultivados en laboratorio, aprox. 1.5 ct en total, talla brillante',
+                   'Largo de 17 cm y ancho de 2.5 mm. Broche de caja con seguro doble',
+                   CUIDADO_ORO)),
+            ('Pulsera de Eslabones', 'Pulseras', 'Acero 316L con baño de oro (PVD)',
+             'Colección Dorada',
              '650.00', 32, False, False, True,
-             'Pulsera de acero inoxidable resistente al agua, con broche de seguridad.'),
-            ('Pulsera Soleil', 'Pulseras', 'Oro 18k', 'Colección Dorada',
+             ficha('Pulsera de eslabones planos con acabado dorado, de aspecto sólido y poco '
+                   'peso. Se puede usar sola o apilada con otras pulseras finas.',
+                   'Acero inoxidable 316L',
+                   'Baño de oro aplicado por PVD, un proceso que forma una capa más adherida '
+                   'y duradera que el baño tradicional',
+                   None,
+                   'Largo de 19 cm y ancho de 5 mm. Cierre de seguridad',
+                   CUIDADO_PVD)),
+            ('Pulsera Soleil', 'Pulseras', 'Oro amarillo 18k', 'Colección Dorada',
              '7980.00', 5, False, True, True,
-             'Pulsera de oro 18k con zafiro central engastado. Ajustable de 16 a 19 cm.'),
+             ficha('Pulsera de cadena fina con un zafiro azul al centro rodeado de pequeños '
+                   'rayos que recuerdan al sol. Es ajustable, así que queda bien en muñecas '
+                   'de distinto tamaño.',
+                   'Oro amarillo de 18 quilates (750)',
+                   'Pulido (oro macizo, sin recubrimiento)',
+                   'Zafiro azul natural de 4 mm',
+                   'Largo ajustable de 16 a 19 cm',
+                   CUIDADO_ORO)),
             ('Esclava Grabable', 'Pulseras', 'Plata 925', 'Regalos Especiales',
-             '1390.00', 14, False, False, True,
-             'Esclava de plata 925 con placa lisa lista para grabar nombre o fecha.'),
-            ('Pulsera Hilo Rojo', 'Pulseras', 'Chapa de oro', 'Regalos Especiales',
+             '1390.00', 0, False, False, True,
+             ficha('Esclava clásica con una placa lisa al frente, lista para grabar un '
+                   'nombre, una fecha o unas iniciales. Un regalo personal que cobra valor '
+                   'con el tiempo.',
+                   'Plata 925',
+                   'Pulido con baño de rodio',
+                   None,
+                   'Placa de 28 x 7 mm. Cadena de 18 cm con 2 cm de extensión',
+                   CUIDADO_PLATA)),
+            ('Pulsera Hilo Rojo', 'Pulseras', 'Latón con baño de oro', 'Regalos Especiales',
              '290.00', 60, False, True, True,
-             'Hilo rojo tejido con dije en chapa de oro. Un detalle pequeño y significativo.'),
+             ficha('Pulsera de hilo rojo con un pequeño dije dorado y nudo corredizo que se '
+                   'ajusta a cualquier muñeca. Es un detalle sencillo y económico para '
+                   'regalar.',
+                   'Hilo de poliéster encerado y dije de latón',
+                   'Dije con baño de oro de 18 quilates',
+                   None,
+                   'Largo ajustable de 14 a 22 cm. Dije de 8 mm',
+                   CUIDADO_BANO)),
 
-            ('Aretes Argolla Pequeños', 'Aretes', 'Chapa de oro', None,
-             '420.00', 48, False, False, True,
-             'Argollas de 15 mm en chapa de oro. Ligeras y cómodas para todo el día.'),
+            # ---------------- ARETES ----------------
+            ('Aretes Argolla Pequeños', 'Aretes', 'Plata 925 con baño de oro',
+             'Colección Dorada',
+             '690.00', 48, False, False, True,
+             ficha('Argollas pequeñas y ligeras con cierre de clic, pensadas para usarse '
+                   'todos los días. Su tamaño las hace discretas y combinan con cualquier '
+                   'otra joya.',
+                   'Plata 925',
+                   'Baño de oro de 18 quilates',
+                   None,
+                   'Diámetro de 15 mm y grosor de 2 mm',
+                   CUIDADO_BANO)),
             ('Aretes Broquel Perla', 'Aretes', 'Plata 925', 'Elegancia en Plata',
              '980.00', 16, False, False, True,
-             'Broqueles de plata 925 con perla cultivada de agua dulce de 7 mm.'),
+             ficha('Broqueles clásicos con una perla redonda de agua dulce sobre poste de '
+                   'plata. Son discretos y se pueden usar de día o con un vestido de noche.',
+                   'Plata 925 (poste y cierre de mariposa)',
+                   'Baño de rodio',
+                   'Perla cultivada de agua dulce de 7 mm',
+                   'Perla de 7 mm',
+                   CUIDADO_PERLA)),
             ('Aretes Céleste Aguamarina', 'Aretes', 'Plata 925', 'Elegancia en Plata',
              '1120.00', 11, True, True, True,
-             'Aretes de plata 925 con aguamarina de talla gota. Cierre de presión seguro.'),
+             ficha('Aretes colgantes con una aguamarina de talla gota que da un tono azul '
+                   'claro muy fresco. Ligeros y cómodos, quedan bien con ropa de día y de '
+                   'noche.',
+                   'Plata 925',
+                   'Baño de rodio',
+                   'Aguamarina natural de talla gota, de 8 x 6 mm',
+                   'Largo total de 22 mm. Poste con cierre de presión',
+                   CUIDADO_PLATA)),
 
+            # ---------------- DIJES ----------------
             ('Dije Corazón Grabable', 'Dijes', 'Plata 925', 'Regalos Especiales',
              '560.00', 28, False, False, True,
-             'Dije de plata en forma de corazón, disponible para grabado personalizado.'),
-            ('Dije Inicial Oro', 'Dijes', 'Oro 14k', 'Regalos Especiales',
+             ficha('Dije en forma de corazón con superficie lisa y el reverso libre para '
+                   'grabar un nombre, una fecha o un mensaje corto. Se vende sin cadena, '
+                   'para que lo combines con la que ya tienes.',
+                   'Plata 925',
+                   'Pulido con baño de rodio',
+                   None,
+                   'Corazón de 14 mm. Argolla para cadenas de hasta 3 mm',
+                   CUIDADO_PLATA)),
+            ('Dije Inicial Oro', 'Dijes', 'Oro amarillo 14k', 'Regalos Especiales',
              '2300.00', 0, False, False, True,
-             'Dije con letra inicial en oro 14k. Se vende por pieza, cadena no incluida.'),
+             ficha('Dije con una letra inicial en oro de 14 quilates, de trazo limpio y sin '
+                   'adornos. Funciona como regalo personalizado y combina con cadenas finas. '
+                   'Se vende por pieza y la cadena no está incluida.',
+                   'Oro amarillo de 14 quilates (585)',
+                   'Pulido (oro macizo, sin recubrimiento)',
+                   None,
+                   'Letra de 10 mm de alto. Argolla para cadenas de hasta 1.5 mm',
+                   CUIDADO_ORO)),
         ]
 
         productos = []
         for (nombre, categoria, material, coleccion, precio, existencias,
              destacado, es_nuevo, activo, descripcion) in datos:
-            obj, _ = Producto.objects.get_or_create(
-                nombre=nombre,
-                defaults={
-                    'categoria': cat[categoria],
-                    'material': mat[material],
-                    'coleccion': col[coleccion] if coleccion else None,
-                    'descripcion': descripcion,
-                    'precio': Decimal(precio),
-                    'existencias': existencias,
-                    'destacado': destacado,
-                    'es_nuevo': es_nuevo,
-                    'activo': activo,
-                },
+            campos = {
+                'categoria': cat[categoria],
+                'material': mat[material],
+                'coleccion': col[coleccion] if coleccion else None,
+                'descripcion': descripcion,
+                'precio': Decimal(precio),
+                'destacado': destacado,
+                'es_nuevo': es_nuevo,
+                'activo': activo,
+            }
+            obj, creado = Producto.objects.get_or_create(
+                nombre=nombre, defaults={**campos, 'existencias': existencias},
             )
+            if not creado:
+                # Producto ya existente: actualiza la ficha, pero conserva sus
+                # existencias actuales (las mueve el inventario).
+                for campo, valor in campos.items():
+                    setattr(obj, campo, valor)
+                obj.save()
+
             self._asignar_imagen(obj, nombre)
             productos.append(obj)
 
@@ -323,52 +456,36 @@ class Command(BaseCommand):
         )
         return productos
 
-    
+    # ------------------------------------------------------------------
+    def _buscar_imagen_local(self, nombre):
+        slug = slugify(nombre)
+        for ext in EXTENSIONES:
+            ruta = DIR_IMAGENES_PRODUCTOS / f'{slug}{ext}'
+            if ruta.exists():
+                return ruta
+        return None
+
     def _asignar_imagen(self, producto, nombre):
         """
-        Descarga la imagen del producto desde Internet y la guarda
-        en imagen_principal.
+        Asigna la foto local del producto (<slug>.jpg en fixtures/imagenes_productos).
+        Si el producto ya tiene imagen, solo la cambia con --reemplazar-imagenes.
         """
+        if producto.imagen_principal and not self.reemplazar_imagenes:
+            return
+
+        ruta = self._buscar_imagen_local(nombre)
+        if ruta is None:
+            self.imagenes_faltantes += 1
+            self.stdout.write(self.style.WARNING(
+                f'  Falta la imagen de "{nombre}": {slugify(nombre)}.jpg'
+            ))
+            return
 
         if producto.imagen_principal:
-            return
-
-        url = IMAGENES_PRODUCTOS.get(nombre)
-
-        if not url:
-            self.stdout.write(
-                self.style.WARNING(
-                    f'  Sin URL de imagen para "{nombre}"'
-                )
-            )
-            return
-
-        try:
-            respuesta = requests.get(url, timeout=15)
-            respuesta.raise_for_status()
-
-            nombre_archivo = f'{slugify(nombre)}.jpg'
-
-            from io import BytesIO
-
-            producto.imagen_principal.save(
-                nombre_archivo,
-                File(BytesIO(respuesta.content)),
-                save=True,
-            )
-
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f'  Imagen descargada: {nombre}'
-                )
-            )
-
-        except requests.RequestException as error:
-            self.stdout.write(
-                self.style.WARNING(
-                    f'  No se pudo descargar la imagen de "{nombre}": {error}'
-                )
-            )
+            producto.imagen_principal.delete(save=False)
+        with open(ruta, 'rb') as archivo:
+            producto.imagen_principal.save(ruta.name, File(archivo), save=True)
+        self.stdout.write(self.style.SUCCESS(f'  Imagen asignada: {nombre}'))
 
     # ------------------------------------------------------------------
     def _crear_usuario(self):
@@ -376,15 +493,15 @@ class Command(BaseCommand):
             username=USUARIO_PRUEBA,
             defaults={
                 'first_name': 'Mariana',
-                'last_name': 'Rivera',
-                'email': 'mariana@ejemplo.com',
+                'last_name': 'Maldonado',
+                'email': 'mariana.m.h802@gmail.com',
             },
         )
         if creado:
             usuario.set_password(PASSWORD_PRUEBA)
             usuario.save()
 
-        # El perfil lo crea automáticamente la señal post_save del modelo Perfil.
+        # El perfil lo crea automaticamente la senal post_save del modelo Perfil.
         perfil = usuario.perfil
         perfil.telefono = '5512345678'
         perfil.save()
@@ -418,16 +535,10 @@ class Command(BaseCommand):
         return usuario, direcciones
 
     # ------------------------------------------------------------------
-    def _crear_favoritos(self, usuario, productos):
-        # Guardamos como favoritos algunos productos de distintas categorías.
-        for producto in [productos[0], productos[5], productos[7], productos[10],
-                         productos[17], productos[18]]:
-            Favorito.objects.get_or_create(usuario=usuario, producto=producto)
-        self.stdout.write(f'  Favoritos: {usuario.favoritos.count()}')
-
     def _crear_resenas(self, usuario, productos):
-        # Un usuario solo puede reseñar cada producto una vez, así que cada
-        # reseña va a un producto distinto.
+        # Un usuario solo puede resenar cada producto una vez, asi que cada
+        # resena va a un producto distinto. Los indices siguen el orden de la
+        # lista de productos de arriba.
         datos = [
             (productos[0], 5, 'El engaste es impecable y el brillo del diamante se nota '
                               'muchísimo en persona. Llegó en una caja preciosa.'),
@@ -452,47 +563,3 @@ class Command(BaseCommand):
                 },
             )
         self.stdout.write(f'  Reseñas: {Resena.objects.count()}')
-
-    # ------------------------------------------------------------------
-    def _crear_pedido(self, usuario, direccion, productos):
-        if Pedido.objects.filter(usuario=usuario).exists():
-            self.stdout.write('  Pedido: ya existía, no se creó otro')
-            return
-
-        pedido = Pedido.objects.create(
-            usuario=usuario,
-            direccion_envio=direccion,
-            nombre_destinatario=direccion.destinatario,
-            calle=direccion.calle,
-            numero=direccion.numero,
-            colonia=direccion.colonia,
-            ciudad=direccion.ciudad,
-            estado_direccion=direccion.estado,
-            codigo_postal=direccion.codigo_postal,
-            pais=direccion.pais,
-            telefono_contacto=direccion.telefono_contacto,
-            estado=Pedido.Estado.PENDIENTE_PAGO,
-        )
-
-        # 3 artículos, descontando el inventario como lo hace el checkout real.
-        articulos = [(productos[6], 1), (productos[15], 2), (productos[18], 1)]
-        for producto, cantidad in articulos:
-            PedidoItem.objects.create(
-                pedido=pedido,
-                producto=producto,
-                nombre_producto=producto.nombre,
-                precio_unitario=producto.precio,
-                cantidad=cantidad,
-            )
-            producto.existencias = max(0, producto.existencias - cantidad)
-            producto.save(update_fields=['existencias'])
-
-        self.stdout.write(
-            f'  Pedido: #{pedido.pk} con {len(articulos)} artículos — total ${pedido.total}'
-        )
-
-    # ------------------------------------------------------------------
-    def _crear_suscriptores(self):
-        for email in ['ana@ejemplo.com', 'lucia@ejemplo.com', 'sofia@ejemplo.com']:
-            Suscriptor.objects.get_or_create(email=email)
-        self.stdout.write(f'  Suscriptores: {Suscriptor.objects.count()}')
