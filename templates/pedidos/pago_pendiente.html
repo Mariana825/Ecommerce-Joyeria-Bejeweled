@@ -8,7 +8,7 @@
 <div class="panel panel-angosto centrado" id="panel-pago">
     <div style="font-size:2.4rem;color:var(--gold);margin-bottom:8px;">◆</div>
     <h1>{{ "¡Pedido registrado!"|traducir:request }}</h1>
-    <p class="subtitulo">{{ "Tu pedido"|traducir:request }} <strong>#{{ numero_pedido }}</strong> {{ "se registró correctamente."|traducir:request }}</p>
+    <p class="subtitulo">{{ "Tu pedido se registró correctamente."|traducir:request }}</p>
 
     <div class="resumen-total" style="justify-content:center;gap:16px;border-top:none;">
         <span class="etiqueta-total">{{ "Total"|traducir:request }}</span>
@@ -24,7 +24,7 @@
 
     {% elif paypal_configurado %}
         <p class="subtitulo" style="margin-top:24px;">
-            {{ "Completa tu pago de forma segura con PayPal (modo de pruebas / sandbox):"|traducir:request }}
+            {{ "Completa tu pago de forma segura con PayPal"|traducir:request }}
         </p>
 
         <div id="paypal-botones" style="margin:20px 0;"></div>
@@ -34,8 +34,11 @@
         <div class="aviso">
             {{ "Estás en el entorno"|traducir:request }} <strong>Sandbox</strong>
             {{ "de PayPal: no se realiza ningún cobro real."|traducir:request }}
-            {{ "Usa una cuenta de comprador de prueba de"|traducir:request }}
-            <a href="https://developer.paypal.com/dashboard/accounts" target="_blank" rel="noopener" style="color:var(--lilac-deep);">developer.paypal.com</a>.
+            <br>
+            <strong>{{ "correo: sb-aykgn53051083@personal.example.com"|traducir:request }}</strong>
+             <br>
+            <strong>{{ "contraseña: prueba123"|traducir:request }}<strong>
+            
         </div>
 
         <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency={{ paypal_currency }}&components=buttons"></script>

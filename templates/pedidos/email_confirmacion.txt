@@ -1,6 +1,6 @@
 {% autoescape off %}Hola {{ usuario.first_name|default:usuario.username }},
 
-¡Gracias por tu compra en Bejeweled! Recibimos el pago de tu pedido #{{ numero_pedido.pk }}.
+¡Gracias por tu compra en Bejeweled! Recibimos el pago de tu pedido.
 
 Artículos:
 {% for item in items %}- {{ item.cantidad }} x {{ item.nombre_producto }} (${{ item.precio_unitario|floatformat:2 }} c/u) = ${{ item.subtotal|floatformat:2 }}

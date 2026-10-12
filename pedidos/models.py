@@ -73,3 +73,5 @@ class PedidoItem(models.Model):
     @property
     def subtotal(self):
         return self.precio_unitario * self.cantidad
+    
+   

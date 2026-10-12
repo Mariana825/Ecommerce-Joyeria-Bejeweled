@@ -110,7 +110,7 @@ def checkout(request):
             return redirect('carrito:ver_carrito')
 
         carrito.vaciar()
-        messages.success(request, f'Tu pedido #{pedido.pk} fue registrado.')
+        messages.success(request, f'Tu pedido fue registrado.')
         return redirect('pedidos:pago_pendiente', pedido_id=pedido.pk)
 
     return render(request, 'pedidos/checkout.html', {

@@ -513,7 +513,7 @@ class Command(BaseCommand):
         direcciones = []
         datos_direcciones = [
             {
-                'etiqueta': 'Casa', 'destinatario': 'Mariana Rivera',
+                'etiqueta': 'Casa', 'destinatario': 'Mariana Maldonado',
                 'calle': 'Av. Paseo de la Reforma', 'numero': '222',
                 'colonia': 'Juárez', 'ciudad': 'Ciudad de México',
                 'estado': 'Ciudad de México', 'codigo_postal': '06600',
@@ -521,7 +521,7 @@ class Command(BaseCommand):
                 'predeterminada': True,
             },
             {
-                'etiqueta': 'Oficina', 'destinatario': 'Mariana Rivera',
+                'etiqueta': 'Oficina', 'destinatario': 'Mariana Maldonado',
                 'calle': 'Calle Río Lerma', 'numero': '45',
                 'colonia': 'Cuauhtémoc', 'ciudad': 'Ciudad de México',
                 'estado': 'Ciudad de México', 'codigo_postal': '06500',

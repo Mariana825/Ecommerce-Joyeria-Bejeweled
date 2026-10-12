@@ -20,7 +20,7 @@ def enviar_correo_compra(pedido):
         'items': pedido.items.all(),
         'total': pedido.total,
     }
-    asunto = f'Bejeweled - Pago confirmado, pedido #{pedido.pk}'
+    asunto = f'Bejeweled - Pago confirmado'
     texto = render_to_string('pedidos/email_confirmacion.txt', contexto)
     html = render_to_string('pedidos/email_confirmacion.html', contexto)
 

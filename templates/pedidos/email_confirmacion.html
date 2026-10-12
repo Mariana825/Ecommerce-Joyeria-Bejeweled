@@ -1,44 +1,85 @@
-<div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; color: #333;">
-  <h2>¡Gracias por tu compra, {{ usuario.first_name|default:usuario.username }}!</h2>
-  <p>Recibimos el pago de tu pedido <strong>#{{ numero_pedido.pk }}</strong>.</p>
+<!DOCTYPE html>
+<html lang="es">
+<body style="margin:0;padding:0;background:#f4f1ea;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f1ea;padding:32px 12px;">
+  <tr><td align="center">
+    <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:6px;overflow:hidden;">
 
-  <table style="width: 100%; border-collapse: collapse;">
-    <thead>
-      <tr style="border-bottom: 2px solid #ddd; text-align: left;">
-        <th style="padding: 8px;">Producto</th>
-        <th style="padding: 8px;">Cant.</th>
-        <th style="padding: 8px; text-align: right;">Precio</th>
-        <th style="padding: 8px; text-align: right;">Subtotal</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in items %}
-      <tr style="border-bottom: 1px solid #eee;">
-        <td style="padding: 8px;">{{ item.nombre_producto }}</td>
-        <td style="padding: 8px;">{{ item.cantidad }}</td>
-        <td style="padding: 8px; text-align: right;">${{ item.precio_unitario|floatformat:2 }}</td>
-        <td style="padding: 8px; text-align: right;">${{ item.subtotal|floatformat:2 }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-    <tfoot>
-      <tr>
-        <td colspan="3" style="padding: 8px; text-align: right;"><strong>Total</strong></td>
-        <td style="padding: 8px; text-align: right;"><strong>${{ total|floatformat:2 }}</strong></td>
-      </tr>
-    </tfoot>
-  </table>
+      <tr><td align="center" style="background:#1a1a1a;padding:26px 20px;">
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;letter-spacing:6px;color:#C9A84C;">BEJEWELED</div>
+        <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:3px;color:#bdbdbd;margin-top:6px;">JOYERÍA FINA</div>
+      </td></tr>
 
-  <p><strong>Estado:</strong> {{ pedido.get_estado_display }}</p>
+      <tr><td align="center" style="padding:36px 40px 6px;">
+        <div style="font-family:Arial,sans-serif;font-size:11px;letter-spacing:3px;color:#C9A84C;">PAGO CONFIRMADO</div>
+        <h1 style="font-family:Georgia,serif;font-weight:normal;font-size:26px;color:#1a1a1a;margin:10px 0 0;">¡Gracias por tu compra, {{ usuario.first_name|default:usuario.username }}!</h1>
+      </td></tr>
 
-  <h3>Dirección de envío</h3>
-  <p>
-    {{ pedido.nombre_destinatario }}<br>
-    {{ pedido.calle }} {{ pedido.numero }}{% if pedido.colonia %}, {{ pedido.colonia }}{% endif %}<br>
-    {{ pedido.ciudad }}, {{ pedido.estado_direccion }}, C.P. {{ pedido.codigo_postal }}<br>
-    {{ pedido.pais }}
-    {% if pedido.telefono_contacto %}<br>Tel: {{ pedido.telefono_contacto }}{% endif %}
-  </p>
+      <tr><td align="center" style="padding:16px 44px 0;font-family:Arial,sans-serif;font-size:15px;line-height:1.7;color:#555555;">
+        Recibimos el pago de tu pedido
+        <strong style="color:#1a1a1a;"></strong>.
+      </td></tr>
 
-  <p>Gracias por elegir Bejeweled.</p>
-</div>
+      <tr><td align="center" style="padding:14px 30px 0;">
+        <span style="display:inline-block;background:#faf8f3;border:1px solid #C9A84C;color:#8a6d1f;font-family:Arial,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;border-radius:20px;">
+          {{ pedido.get_estado_display }}
+        </span>
+      </td></tr>
+
+      <tr><td style="padding:28px 36px 0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-family:Arial,sans-serif;font-size:14px;color:#333333;">
+          <thead>
+            <tr>
+              <th align="left" style="padding:10px 6px;border-bottom:2px solid #C9A84C;font-size:11px;letter-spacing:2px;color:#999999;font-weight:normal;">PRODUCTO</th>
+              <th align="center" style="padding:10px 6px;border-bottom:2px solid #C9A84C;font-size:11px;letter-spacing:2px;color:#999999;font-weight:normal;">CANT.</th>
+              <th align="right" style="padding:10px 6px;border-bottom:2px solid #C9A84C;font-size:11px;letter-spacing:2px;color:#999999;font-weight:normal;">PRECIO</th>
+              <th align="right" style="padding:10px 6px;border-bottom:2px solid #C9A84C;font-size:11px;letter-spacing:2px;color:#999999;font-weight:normal;">SUBTOTAL</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in items %}
+            <tr>
+              <td style="padding:12px 6px;border-bottom:1px solid #eeeeee;color:#1a1a1a;">{{ item.nombre_producto }}</td>
+              <td align="center" style="padding:12px 6px;border-bottom:1px solid #eeeeee;">{{ item.cantidad }}</td>
+              <td align="right" style="padding:12px 6px;border-bottom:1px solid #eeeeee;">${{ item.precio_unitario|floatformat:2 }}</td>
+              <td align="right" style="padding:12px 6px;border-bottom:1px solid #eeeeee;">${{ item.subtotal|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" align="right" style="padding:16px 6px 0;font-size:12px;letter-spacing:2px;color:#999999;">TOTAL</td>
+              <td align="right" style="padding:14px 6px 0;font-family:Georgia,serif;font-size:22px;color:#1a1a1a;">${{ total|floatformat:2 }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </td></tr>
+
+      <tr><td style="padding:30px 44px 0;">
+        <div style="border-top:1px solid #eeeeee;"></div>
+      </td></tr>
+
+      <tr><td align="center" style="padding:22px 44px 0;font-family:Arial,sans-serif;">
+        <div style="font-size:11px;letter-spacing:3px;color:#C9A84C;">DIRECCIÓN DE ENVÍO</div>
+        <div style="font-size:14px;line-height:1.7;color:#555555;margin-top:10px;">
+          <strong style="color:#1a1a1a;">{{ pedido.nombre_destinatario }}</strong><br>
+          {{ pedido.calle }} {{ pedido.numero }}{% if pedido.colonia %}, {{ pedido.colonia }}{% endif %}<br>
+          {{ pedido.ciudad }}, {{ pedido.estado_direccion }}, C.P. {{ pedido.codigo_postal }}<br>
+          {{ pedido.pais }}
+          {% if pedido.telefono_contacto %}<br>Tel: {{ pedido.telefono_contacto }}{% endif %}
+        </div>
+      </td></tr>
+
+      <tr><td align="center" style="padding:30px 44px 32px;font-family:Georgia,serif;font-size:16px;font-style:italic;color:#1a1a1a;">
+        Gracias por elegir Bejeweled.
+      </td></tr>
+
+      <tr><td align="center" style="background:#faf8f3;padding:18px 30px;font-family:Arial,sans-serif;font-size:11px;color:#999999;">
+        &copy; Bejeweled &middot; Joyería fina
+      </td></tr>
+
+    </table>
+  </td></tr>
+</table>
+</body>
+</html>
