@@ -24,5 +24,7 @@ urlpatterns = [
     
     path('newsletter/', views.suscribir_newsletter, name='newsletter'),
     path('newsletter/baja/<str:token>/', views.newsletter_baja, name='newsletter_baja'),
-    
+
+    #politica de privacidad
+    path('politica-privacidad/', views.politica_privacidad, name='politica_privacidad'),
 ]

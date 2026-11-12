@@ -91,11 +91,11 @@
                 {{ "Todos los derechos reservados."|traducir:request }}
             </p>
 
-            <div class="legales">
-                <a href="#">{{ "Privacidad"|traducir:request }}</a>
-                <a href="#">{{ "Términos"|traducir:request }}</a>
-                <a href="#">{{ "Cookies"|traducir:request }}</a>
-            </div>
+           <div class="legales">
+            <a href="{% url 'productos:politica_privacidad' %}#privacidad">{{ "Privacidad"|traducir:request }}</a>
+            <a href="{% url 'productos:politica_privacidad' %}#terminos">{{ "Términos"|traducir:request }}</a>
+            <a href="{% url 'productos:politica_privacidad' %}#cookies">{{ "Cookies"|traducir:request }}</a>
+        </div>
         </div>
     </div>
 </footer>

@@ -985,3 +985,105 @@ form ul.errorlist { color: var(--danger); }
     }
     .burbuja-chat { right: 16px; bottom: 16px; }
 }
+
+
+/* ============================================================
+   PÁGINA LEGAL (privacidad, términos, cookies)
+   ============================================================ */
+html { scroll-behavior: smooth; }
+
+.legal { max-width: 860px; margin: 0 auto; }
+
+/* Cabecera con botones */
+.legal-cabecera { text-align: center; margin-bottom: 40px; }
+.legal-cabecera h1 { font-size: 2.2rem; margin: 0 0 8px; }
+.legal-cabecera > p {
+    font-size: 0.8rem; font-weight: 300;
+    letter-spacing: 0.06em; margin: 0 0 28px;
+    color: var(--muted-foreground);
+}
+.legal-botones { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+.legal-botones a {
+    padding: 11px 28px;
+    font-size: 0.72rem; font-weight: 600;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--lilac-deep);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.legal-botones a:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Tarjetas de resumen */
+.legal-resumen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px; margin-bottom: 40px;
+}
+.legal-dato {
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    gap: 10px; padding: 28px 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    transition: background 0.25s;
+}
+.legal-dato:hover { background: var(--lilac-pale); }
+.legal-dato .icono-circulo {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--muted); color: var(--primary);
+}
+.legal-dato h3 { font-size: 1rem; margin: 0; }
+.legal-dato p {
+    font-size: 0.8rem; font-weight: 300; line-height: 1.7;
+    color: var(--muted-foreground); margin: 0;
+}
+
+/* Secciones como tarjetas */
+.legal section {
+    scroll-margin-top: 90px;
+    margin-bottom: 28px; padding: 40px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+.legal section h2 {
+    font-size: 1.7rem; margin: 0 0 20px; padding-bottom: 14px;
+    border-bottom: 2px solid var(--gold);
+}
+.legal section h3 { font-size: 1.1rem; margin: 26px 0 8px; color: var(--lilac-deep); }
+.legal section p, .legal section li {
+    font-size: 0.9rem; font-weight: 300; line-height: 1.9;
+    color: var(--muted-foreground);
+}
+.legal section p { margin: 0 0 12px; }
+.legal section ul { margin: 0 0 12px; padding-left: 20px; }
+.legal section li::marker { color: var(--gold); }
+.legal section a { color: var(--lilac-deep); font-weight: 600; }
+.legal section a:hover { text-decoration: underline; }
+
+/* Recuadro de nota */
+.legal-nota {
+    margin: 24px 0;
+    padding: 18px 22px;
+    background: var(--lilac-pale);
+    border-left: 3px solid var(--gold);
+    border-radius: 2px;
+}
+.legal-nota strong {
+    display: block; margin-bottom: 6px;
+    font-family: 'Gilda Display', serif; font-weight: 400;
+    font-size: 1rem; color: var(--lilac-deep);
+}
+.legal-nota p { margin: 0; }
+
+@media (max-width: 600px) {
+    .legal-cabecera h1 { font-size: 1.8rem; }
+    .legal section { padding: 24px; }
+}

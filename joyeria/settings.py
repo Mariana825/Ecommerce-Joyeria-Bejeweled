@@ -27,15 +27,14 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = [h for h in os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',') if h]
 
-# Con runsslserver el sitio se sirve por HTTPS en desarrollo; Django exige
-# declarar el origen explícitamente (con esquema) para aceptar POSTs entre
-# páginas servidas por https://127.0.0.1:8000 (formularios, checkout, etc.).
 CSRF_TRUSTED_ORIGINS = [
-    'https://localhost:8000',
-    'https://127.0.0.1:8000',
+    o for o in os.environ.get(
+        'CSRF_TRUSTED_ORIGINS', 'https://localhost:8000,https://127.0.0.1:8000'
+    ).split(',') if o
 ]
+
 
 # --- Aplicaciones ------------------------------------------------------------
 INSTALLED_APPS = [
@@ -266,3 +265,7 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 EMAIL_TIMEOUT = 20
 
 SITE_URL = os.getenv('SITE_URL', 'https://127.0.0.1:8000')
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

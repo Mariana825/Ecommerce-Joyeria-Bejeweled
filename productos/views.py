@@ -269,3 +269,6 @@ def newsletter_baja(request, token):
     Suscriptor.objects.filter(email=email).update(activo=False)
     messages.info(request, 'Te diste de baja del boletín.')
     return redirect('productos:catalogo')
+
+def politica_privacidad(request):
+    return render(request, 'productos/politica_privacidad.html')

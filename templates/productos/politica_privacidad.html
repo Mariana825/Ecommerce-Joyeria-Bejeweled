@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load traducir_tags %}
+
+{% block titulo %}Información legal — Bejeweled{% endblock %}
+
+{% block contenido %}
+<div class="legal">
+
+    <header class="legal-cabecera">
+        <h1>{{ "Información legal"|traducir:request }}</h1>
+        <p>{{ "Última actualización"|traducir:request }}: {% now "d/m/Y" %}</p>
+
+        <nav class="legal-botones">
+            <a href="#privacidad">{{ "Privacidad"|traducir:request }}</a>
+            <a href="#terminos">{{ "Términos"|traducir:request }}</a>
+            <a href="#cookies">{{ "Cookies"|traducir:request }}</a>
+        </nav>
+    </header>
+
+    <div class="legal-resumen">
+        <div class="legal-dato">
+            <span class="icono-circulo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+            </span>
+            <h3>{{ "No vendemos tus datos"|traducir:request }}</h3>
+            <p>{{ "Solo los usamos para operar tu compra y tu cuenta."|traducir:request }}</p>
+        </div>
+        <div class="legal-dato">
+            <span class="icono-circulo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+            </span>
+            <h3>{{ "Pagos protegidos"|traducir:request }}</h3>
+            <p>{{ "No almacenamos los datos de tu tarjeta."|traducir:request }}</p>
+        </div>
+        <div class="legal-dato">
+            <span class="icono-circulo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+            </span>
+            <h3>{{ "Tú decides"|traducir:request }}</h3>
+            <p>{{ "Pide acceso, cambios o baja de tus datos cuando quieras."|traducir:request }}</p>
+        </div>
+    </div>
+
+    {# ───────────── PRIVACIDAD ───────────── #}
+    <section id="privacidad">
+        <h2>{{ "Política de Privacidad"|traducir:request }}</h2>
+
+        <p>{{ "En Bejeweled valoramos tu privacidad. Esta política explica qué datos personales recopilamos, cómo los usamos y cuáles son tus derechos."|traducir:request }}</p>
+
+        <h3>{{ "Responsable"|traducir:request }}</h3>
+        <p>
+            {{ "Bejeweled, con domicilio en Ciudad de México, México, es responsable del tratamiento de tus datos personales. Contáctanos en"|traducir:request }}
+            <a href="mailto:hola@bejeweled.com">hola@bejeweled.com</a>.
+        </p>
+
+        <h3>{{ "Datos que recopilamos"|traducir:request }}</h3>
+        <ul>
+            <li>{{ "Datos de cuenta: nombre, correo electrónico y contraseña (almacenada de forma cifrada)."|traducir:request }}</li>
+            <li>{{ "Datos de envío: dirección, ciudad, código postal y teléfono."|traducir:request }}</li>
+            <li>{{ "Datos de pedidos: productos comprados, importes, estado y referencia de pago."|traducir:request }}</li>
+            <li>{{ "Suscripción al boletín: tu correo electrónico."|traducir:request }}</li>
+            <li>{{ "Interacciones con el sitio: favoritos, carrito y reseñas."|traducir:request }}</li>
+        </ul>
+
+        <h3>{{ "Para qué usamos tus datos"|traducir:request }}</h3>
+        <ul>
+            <li>{{ "Crear y administrar tu cuenta."|traducir:request }}</li>
+            <li>{{ "Procesar y enviar tus pedidos, y notificarte sobre su estado."|traducir:request }}</li>
+            <li>{{ "Enviarte correos de recuperación de contraseña y confirmación de compra."|traducir:request }}</li>
+            <li>{{ "Enviarte novedades y promociones, solo si te suscribiste al boletín."|traducir:request }}</li>
+            <li>{{ "Mejorar nuestro catálogo y la experiencia en el sitio."|traducir:request }}</li>
+        </ul>
+
+        <div class="legal-nota">
+            <strong>{{ "Pagos y terceros"|traducir:request }}</strong>
+            <p>{{ "Los pagos se procesan a través de proveedores externos como PayPal; Bejeweled no almacena los datos de tu tarjeta. Solo compartimos información con proveedores necesarios para operar la tienda (pagos, correo y paquetería) o cuando la ley lo exija."|traducir:request }}</p>
+        </div>
+
+        <h3>{{ "Tus derechos"|traducir:request }}</h3>
+        <p>
+            {{ "Puedes solicitar el acceso, rectificación, cancelación u oposición al tratamiento de tus datos (derechos ARCO), o darte de baja del boletín, escribiendo a"|traducir:request }}
+            <a href="mailto:hola@bejeweled.com">hola@bejeweled.com</a>.
+        </p>
+    </section>
+
+    {# ───────────── TÉRMINOS ───────────── #}
+    <section id="terminos">
+        <h2>{{ "Términos y Condiciones"|traducir:request }}</h2>
+
+        <p>{{ "Al usar este sitio y realizar compras en Bejeweled aceptas los siguientes términos."|traducir:request }}</p>
+
+        <h3>{{ "Cuenta de usuario"|traducir:request }}</h3>
+        <p>{{ "Eres responsable de la veracidad de tus datos y de mantener la confidencialidad de tu contraseña. Debes ser mayor de edad para realizar compras."|traducir:request }}</p>
+
+        <h3>{{ "Productos y precios"|traducir:request }}</h3>
+        <p>{{ "Las imágenes son ilustrativas y pueden existir ligeras variaciones de color o acabado en piezas elaboradas con materiales naturales. Los precios pueden cambiar sin previo aviso; el precio aplicable es el vigente al confirmar tu pedido."|traducir:request }}</p>
+
+        <h3>{{ "Pedidos y pagos"|traducir:request }}</h3>
+        <p>{{ "Un pedido queda confirmado cuando se acredita el pago. Nos reservamos el derecho de cancelar pedidos por falta de existencias, errores evidentes de precio o sospecha de fraude, reembolsando el importe pagado."|traducir:request }}</p>
+
+        <h3>{{ "Envíos"|traducir:request }}</h3>
+        <p>{{ "Los tiempos de entrega son estimados y pueden variar según la paquetería y tu ubicación. Es responsabilidad del cliente proporcionar una dirección correcta y completa."|traducir:request }}</p>
+
+        <div class="legal-nota">
+            <strong>{{ "Cambios y devoluciones"|traducir:request }}</strong>
+            <p>
+                {{ "Si tu pieza llega dañada o no corresponde a tu pedido, contáctanos dentro de los primeros días posteriores a la entrega en"|traducir:request }}
+                <a href="mailto:hola@bejeweled.com">hola@bejeweled.com</a>
+                {{ "para gestionar un cambio o reembolso. La pieza debe conservar su estado original."|traducir:request }}
+            </p>
+        </div>
+
+        <h3>{{ "Propiedad intelectual"|traducir:request }}</h3>
+        <p>{{ "El contenido del sitio (logotipos, textos, imágenes y diseños) pertenece a Bejeweled y no puede usarse sin autorización previa."|traducir:request }}</p>
+
+        <h3>{{ "Legislación aplicable"|traducir:request }}</h3>
+        <p>{{ "Estos términos se rigen por las leyes de los Estados Unidos Mexicanos."|traducir:request }}</p>
+    </section>
+
+    {# ───────────── COOKIES ───────────── #}
+    <section id="cookies">
+        <h2>{{ "Política de Cookies"|traducir:request }}</h2>
+
+        <p>{{ "Las cookies son pequeños archivos que se guardan en tu navegador para que el sitio funcione correctamente y recuerde tus preferencias."|traducir:request }}</p>
+
+        <h3>{{ "Cookies que utilizamos"|traducir:request }}</h3>
+        <ul>
+            <li>{{ "Esenciales: mantienen tu sesión iniciada y protegen los formularios (seguridad)."|traducir:request }}</li>
+            <li>{{ "Funcionales: recuerdan tu carrito y tu idioma preferido."|traducir:request }}</li>
+        </ul>
+
+        <div class="legal-nota">
+            <strong>{{ "Cómo desactivarlas"|traducir:request }}</strong>
+            <p>{{ "Puedes bloquear o eliminar las cookies desde la configuración de tu navegador. Si lo haces, algunas funciones, como el carrito o el inicio de sesión, podrían dejar de funcionar."|traducir:request }}</p>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
