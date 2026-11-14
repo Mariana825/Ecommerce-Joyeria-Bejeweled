@@ -1,0 +1,4 @@
+# Dependencias SOLO para ejecutar las pruebas (instálalas en tu venv):
+#   pip install -r requirements-dev.txt
+pytest>=8.0
+pytest-django>=4.8
