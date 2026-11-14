@@ -1087,3 +1087,213 @@ html { scroll-behavior: smooth; }
     .legal-cabecera h1 { font-size: 1.8rem; }
     .legal section { padding: 24px; }
 }
+
+/* ============================================================
+   AJUSTES PARA CELULAR
+   Evitan bordes y franjas blancas en pantallas pequeñas.
+   Van al FINAL del archivo para sobrescribir sin tocar lo anterior.
+   ============================================================ */
+
+/* 1) Nada debe ensanchar la página: quita la franja blanca lateral */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { max-width: 100%; }
+body { overflow-x: hidden; }
+@supports (overflow: clip) { body { overflow-x: clip; } }
+
+/* 2) El footer siempre queda al fondo: sin franja blanca debajo en páginas cortas */
+body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+body > * { width: 100%; min-width: 0; }
+.site-footer { margin-top: auto; }
+
+/* 3) Sin recuadro gris/blanco al tocar enlaces y botones; sin zoom por doble toque */
+a, button, label, input, select, textarea, .btn {
+    -webkit-tap-highlight-color: transparent;
+}
+a, button, .btn { touch-action: manipulation; }
+
+/* 4) Safari: el desenfoque del header y las líneas finas en tarjetas con bordes redondeados */
+.site-header { -webkit-backdrop-filter: blur(10px); }
+.tarjeta-categoria, .tarjeta-coleccion, .tarjeta-producto .imagen {
+    isolation: isolate;
+    transform: translateZ(0);
+}
+
+/* 5) Rejillas que nunca superan el ancho de la pantalla (celulares de 320 a 360 px) */
+.grid-categorias { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+.grid-colecciones { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+.grid-beneficios { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+.grid-tarjetas { grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr)); }
+.legal-resumen { grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); }
+
+.layout-catalogo > *, .layout-carrito > *, .layout-checkout > *, .detalle-producto > * {
+    min-width: 0;
+}
+
+/* 6) Textos largos (correos, palabras sin espacios) no empujan el ancho */
+.legal section, .descripcion-producto, .resena p, .tarjeta-direccion,
+.aviso, .mensaje, .panel { overflow-wrap: anywhere; }
+
+/* 7) Pantallas sin cursor (celulares y tabletas): sin efectos de hover que se quedan pegados */
+@media (hover: none) {
+    .btn:hover,
+    .tarjeta-producto:hover { transform: none; }
+    .tarjeta-producto:hover .imagen img,
+    .tarjeta-categoria:hover img,
+    .tarjeta-coleccion:hover img { transform: none; }
+}
+
+/* ---------- Tabletas y celulares grandes ---------- */
+@media (max-width: 1024px) {
+    .layout-catalogo, .layout-carrito, .layout-checkout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* ---------- Celulares ---------- */
+@media (max-width: 680px) {
+    /* Solo los lados: el atajo 'padding: 0 16px' borraba el espacio de arriba y abajo de .seccion */
+    .contenedor, .contenedor-angosto { padding-left: 16px; padding-right: 16px; }
+
+    /* Encabezado: que logo, carrito y menú quepan en una sola fila */
+    .header-inner { gap: 10px; height: 60px; }
+    .logo-texto { font-size: 1.2rem; letter-spacing: 0.12em; }
+    .header-acciones { gap: 6px; }
+    .menu-usuario > span {
+        display: inline-block; max-width: 84px;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        vertical-align: middle;
+    }
+    .nav-movil { padding: 16px; }
+
+    /* Inicio */
+    .hero { min-height: 80vh; min-height: 80svh; }
+    .hero-contenido { padding: 72px 0; }
+    .hero-botones .btn { width: 100%; }
+    .seccion-titulo { margin-bottom: 36px; }
+    .seccion-eyebrow .linea { width: 32px; }
+    .seccion-eyebrow span { letter-spacing: 0.2em; }
+    .gold-divider.estrecho { margin: 0 24px; }
+    .banda-garantias span { font-size: 0.6rem; letter-spacing: 0.14em; }
+    .seccion-ia { padding: 64px 0; }
+    .seccion-newsletter { padding: 56px 0; }
+
+    /* Categorías en dos columnas, colecciones y beneficios en una */
+    .grid-categorias { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .tarjeta-categoria .info { padding: 14px; }
+    .tarjeta-categoria .info h3 { font-size: 1rem; }
+    .grid-colecciones { grid-template-columns: minmax(0, 1fr); }
+    .tarjeta-coleccion { min-height: 300px; }
+    .tarjeta-coleccion .info { padding: 20px; }
+    .grid-beneficios { grid-template-columns: minmax(0, 1fr); }
+    .beneficio { padding: 28px 20px; }
+
+    /* Catálogo: dos productos por fila en cualquier celular */
+    .grid-productos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .tarjeta-producto .info { padding: 12px; }
+    .tarjeta-producto .info h3 { font-size: 0.92rem; }
+    .tarjeta-producto .pie { flex-wrap: wrap; gap: 6px; }
+    .precio { font-size: 0.92rem; }
+    .filtros { padding: 18px; }
+    .barra-resultados { font-size: 0.78rem; }
+
+    /* Detalle de producto */
+    .detalle-producto { grid-template-columns: minmax(0, 1fr); gap: 28px; margin-top: 24px; }
+    .info-producto h1 { font-size: 1.7rem; }
+    .form-agregar { flex-wrap: wrap; }
+    .form-agregar .btn { flex: 1 1 100%; }
+    .rango-precio { flex-wrap: wrap; }
+
+    /* Newsletter apilado */
+    .form-newsletter { flex-direction: column; gap: 10px; }
+    .form-newsletter input {
+        border: 1px solid var(--border); border-radius: 2px; text-align: center;
+    }
+    .form-newsletter button { width: 100%; border-radius: 2px; }
+
+    /* Cuenta, carrito y pago */
+    .panel { padding: 20px; }
+    .panel-angosto { margin: 28px auto; }
+    .layout-carrito, .layout-checkout { gap: 24px; }
+    .resumen-lateral { padding: 22px; }
+    .pasos-checkout { flex-wrap: wrap; gap: 8px; letter-spacing: 0.08em; }
+    .opcion-direccion { padding: 14px; }
+    .tabla .celda-producto { align-items: flex-start; }
+
+    /* Footer */
+    .footer-grid { padding: 48px 0 32px; gap: 32px; }
+    .footer-barra { flex-direction: column; align-items: flex-start; }
+    .footer-barra .legales { flex-wrap: wrap; gap: 8px 20px; }
+
+    /* Chat: usa la altura visible real (la barra del navegador no lo tapa) */
+    .panel-chat {
+        height: calc(100vh - 24px);
+        height: calc(100dvh - 24px);
+        bottom: calc(12px + env(safe-area-inset-bottom));
+    }
+    .burbuja-chat {
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        right: calc(16px + env(safe-area-inset-right));
+    }
+
+    /* iPhone: con letra menor a 16 px, Safari hace zoom al tocar un campo y deja bordes blancos */
+    html body input:not([type="checkbox"]):not([type="radio"]),
+    html body select,
+    html body textarea { font-size: 16px; }
+}
+
+/* ---------- Celulares muy angostos (320 px) ---------- */
+@media (max-width: 380px) {
+    .logo-texto { font-size: 1.05rem; letter-spacing: 0.08em; }
+    .logo-marca { width: 28px; height: 28px; }
+    .hero h1 { font-size: 2rem; }
+    .tarjeta-producto .info h3 { font-size: 0.85rem; }
+    .btn { padding: 13px 20px; }
+    .footer-grid { gap: 28px; }
+}
+
+
+/* ============================================================
+   HEADER EN CELULAR
+   En pantallas angostas solo caben: logo, carrito y botón de menú.
+   Lo demás (buscar, favoritos, cuenta) vive en el menú móvil.
+   ============================================================ */
+
+/* El header nunca debe ser más ancho que la pantalla */
+.header-inner { min-width: 0; }
+.logo { min-width: 0; }
+.logo-texto { white-space: nowrap; }
+.header-acciones { flex-shrink: 0; }
+
+/* El selector de idioma del menú móvil estaba oculto por la regla de 1024 px */
+.nav-movil .selector-idioma { display: flex; }
+.nav-movil form { margin: 0; }
+
+/* Botón "Cerrar sesión" con el mismo aspecto que los enlaces del menú móvil */
+.nav-movil .link-boton {
+    display: block; width: 100%; text-align: left; padding: 0;
+    font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
+    text-decoration: none; color: var(--foreground);
+}
+
+@media (max-width: 680px) {
+    /* Oculta buscar, favoritos, cuenta e inicio de sesión del header.
+       Funciona con el header.html viejo y con el nuevo (no depende de la clase). */
+    .solo-escritorio,
+    #btn-buscar,
+    #caja-buscar,
+    .header-acciones > .icono-btn:not(.carrito-btn):not(.menu-movil-btn),
+    .header-acciones > .menu-usuario { display: none !important; }
+
+    .header-inner { gap: 8px; flex-wrap: nowrap; }
+    .header-acciones { gap: 4px; }
+    .icono-btn { padding: 5px; }
+
+    /* El logo se encoge en vez de empujar los botones fuera de la pantalla */
+    .logo { flex: 0 1 auto; min-width: 0; gap: 8px; }
+    .logo-marca { width: 30px; height: 30px; flex-shrink: 0; }
+    .logo-texto { font-size: 1.1rem; letter-spacing: 0.1em; min-width: 0; overflow: hidden; }
+
+    /* Nada dentro del header puede ensanchar la página (iPhone la encogería con zoom) */
+    .site-header { overflow-x: hidden; }
+    @supports (overflow: clip) { .site-header { overflow-x: clip; } }
+}

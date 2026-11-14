@@ -1,5 +1,30 @@
 {% load traducir_tags %}
 {% load static %}
+<style>
+    .header-inner { min-width: 0; }
+    .logo { min-width: 0; }
+    .logo-texto { white-space: nowrap; }
+    .header-acciones { flex-shrink: 0; }
+    .nav-movil .selector-idioma { display: flex; }
+
+    @media (max-width: 680px) {
+        #btn-buscar,
+        #caja-buscar,
+        .header-acciones > .icono-btn:not(.carrito-btn):not(.menu-movil-btn),
+        .header-acciones > .menu-usuario,
+        .header-acciones > .selector-idioma { display: none !important; }
+
+        .header-inner { gap: 8px; flex-wrap: nowrap; }
+        .header-acciones { gap: 4px; }
+        .icono-btn { padding: 5px; }
+        .logo { flex: 0 1 auto; gap: 8px; }
+        .logo-marca { width: 30px; height: 30px; flex-shrink: 0; }
+        .logo-texto { font-size: 1.1rem; letter-spacing: 0.1em; min-width: 0; overflow: hidden; }
+
+        .site-header { overflow-x: hidden; }
+        @supports (overflow: clip) { .site-header { overflow-x: clip; } }
+    }
+</style>
 
 <header class="site-header">
     <div class="contenedor header-inner">
