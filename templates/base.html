@@ -4,13 +4,53 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
     <title>{% block titulo %}Bejeweled — Joyería Fina{% endblock %}</title>
     <meta name="description" content="Joyería fina: anillos, collares, pulseras y aretes en oro, plata y piedras preciosas.">
    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4">
     <link rel="icon" type="image/jpeg" href="/media/productos/favicon.jpg">
+
+       
+    {# Ajustes para celular. Van aquí para que siempre se apliquen, sin depender del caché del CSS. #}
+    <style>
+        /* 1) Texto pegado al borde izquierdo (pedidos, detalle de pedido, perfil...):
+              la regla .seccion le quitaba al contenedor principal su relleno lateral. */
+        @media (max-width: 1248px) {
+            .contenedor.seccion { padding-left: 24px; padding-right: 24px; }
+        }
+
+        @media (max-width: 680px) {
+            /* 2) Chatbot: ocupa el alto realmente visible y no se corta arriba. */
+            .panel-chat {
+                top: 12px; bottom: 12px; left: 12px; right: 12px;
+                width: auto; height: auto; max-width: none; max-height: none;
+            }
+
+            /* 3) Colecciones: migas de pan, título y descripción centrados */
+            .pagina-colecciones .migas { text-align: center; justify-content: center; }
+            .pagina-colecciones h1,
+            .pagina-colecciones h1 + p,
+            .pagina-colecciones main > p { text-align: center; }
+        }
+                /* 4) Reseñas: la lista y el recuadro se apilan y no se salen de la pantalla */
+        @media (max-width: 680px) {
+            [style*="grid-template-columns"],
+            [class*="resena"] {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+            [class*="resena"] > * { min-width: 0; max-width: 100%; }
+            .panel { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+        }
+
+        /* Mismo arreglo para cualquier rejilla que tenga un recuadro como hijo directo.
+           Va aparte: si el navegador no entiende :has(), solo se ignora esta regla. */
+        @media (max-width: 680px) {
+            :has(> .panel) { grid-template-columns: minmax(0, 1fr) !important; }
+            :has(> .panel) > * { min-width: 0; }
+        }
+    </style>
 </head>
-<body>
+<body class="{% if 'coleccion' in request.resolver_match.url_name %}pagina-colecciones{% endif %}">
 
 {% include 'partials/header.html' %}
 

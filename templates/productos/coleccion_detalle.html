@@ -7,17 +7,41 @@
 
 {% block contenido %}
 
-<p class="migas">
-    <a href="{% url 'productos:inicio' %}">
-        {{ "Inicio"|traducir:request }}
-    </a>
-    ·
-    <a href="{% url 'productos:colecciones' %}">
-        {{ "Colecciones"|traducir:request }}
-    </a>
-    ·
-    {{ coleccion.nombre|traducir:request }}
-</p>
+<style>
+    /* Ruta de navegación centrada: Inicio ◆ Colecciones ◆ Colección */
+    .migas {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+        gap: 6px 14px;
+        margin: 28px 0 32px;
+        text-align: center;
+        font-size: 0.72rem; font-weight: 500;
+        letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--muted-foreground);
+    }
+    .migas a { transition: color 0.2s; }
+    .migas a:hover { color: var(--gold); }
+    .migas .migas-sep { color: var(--gold); font-size: 0.5rem; line-height: 1; }
+    .migas [aria-current="page"] { color: var(--lilac-deep); font-weight: 600; }
+
+    /* Descripción de la colección: justificada y centrada como bloque */
+    .seccion-titulo p {
+        max-width: 640px;
+        margin: 0 auto;
+        text-align: justify;
+        text-align-last: center;
+        text-justify: inter-word;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+    }
+</style>
+
+<nav class="migas" aria-label="{{ 'Ruta de navegación'|traducir:request }}">
+    <a href="{% url 'productos:inicio' %}">{{ "Inicio"|traducir:request }}</a>
+    <span class="migas-sep" aria-hidden="true">◆</span>
+    <a href="{% url 'productos:colecciones' %}">{{ "Colecciones"|traducir:request }}</a>
+    <span class="migas-sep" aria-hidden="true">◆</span>
+    <span aria-current="page">{{ coleccion.nombre|traducir:request }}</span>
+</nav>
 
 <div class="seccion-titulo">
 

@@ -4,13 +4,32 @@
 
 {% block contenido %}
 
-<p class="migas">
-    <a href="{% url 'productos:inicio' %}">Inicio</a> ·
+<style>
+    /* Ruta de navegación centrada: Inicio ◆ Catálogo ◆ Categoría */
+    .migas {
+        display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+        gap: 6px 14px;
+        margin: 28px 0 32px;
+        text-align: center;
+        font-size: 0.72rem; font-weight: 500;
+        letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--muted-foreground);
+    }
+    .migas a { transition: color 0.2s; }
+    .migas a:hover { color: var(--gold); }
+    .migas .migas-sep { color: var(--gold); font-size: 0.5rem; line-height: 1; }
+    .migas [aria-current="page"] { color: var(--lilac-deep); font-weight: 600; }
+</style>
+
+<nav class="migas" aria-label="Ruta de navegación">
+    <a href="{% url 'productos:inicio' %}">Inicio</a>
+    <span class="migas-sep" aria-hidden="true">◆</span>
     <a href="{% url 'productos:catalogo' %}">Catálogo</a>
     {% if producto.categoria %}
-        · <a href="{% url 'productos:catalogo' %}?categoria={{ producto.categoria.slug }}">{{ producto.categoria.nombre }}</a>
+        <span class="migas-sep" aria-hidden="true">◆</span>
+        <a href="{% url 'productos:catalogo' %}?categoria={{ producto.categoria.slug }}" aria-current="page">{{ producto.categoria.nombre }}</a>
     {% endif %}
-</p>
+</nav>
 
 <div class="detalle-producto">
 
@@ -101,7 +120,36 @@
 
         {% if producto.descripcion %}
             <h3 style="font-size:1.1rem;margin:28px 0 10px;">{{ "Descripción"|traducir:request }}</h3>
-            <div class="descripcion-producto">{{ producto.descripcion|traducir:request|linebreaks }}</div>
+            <div class="descripcion-producto" id="descripcion-producto">{{ producto.descripcion|traducir:request|linebreaks }}</div>
+
+            <style>
+                .descripcion-producto {
+                    text-align: justify;
+                    text-justify: inter-word;
+                    hyphens: auto;
+                    -webkit-hyphens: auto;
+                }
+                .descripcion-producto p { margin: 0 0 16px; }
+                .descripcion-producto .desc-linea { display: block; margin: 0 0 6px; }
+                .descripcion-producto .desc-linea strong { font-weight: 600; color: var(--lilac-deep); }
+            </style>
+
+            <script>
+            (function () {
+                var cont = document.getElementById('descripcion-producto');
+                if (!cont) return;
+                cont.querySelectorAll('p').forEach(function (p) {
+                    var lineas = p.innerHTML.split(/<br\s*\/?>/i);
+                    if (lineas.length < 2) return;
+                    p.innerHTML = lineas.map(function (l) {
+                        l = l.trim();
+                        if (!l) return '';
+                        l = l.replace(/^([^:.<]{2,40}):/, '<strong>$1:</strong>');
+                        return '<span class="desc-linea">' + l + '</span>';
+                    }).join('');
+                });
+            })();
+            </script>
         {% endif %}
     </div>
 </div>

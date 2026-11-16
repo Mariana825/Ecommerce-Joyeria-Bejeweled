@@ -4,136 +4,403 @@
 {% block titulo %}Información legal — Bejeweled{% endblock %}
 
 {% block contenido %}
+<style>
+/* ============================================================
+   PÁGINA LEGAL (privacidad, términos, cookies)
+   Ajusta --legal-offset a la altura de tu header fijo/sticky.
+   ============================================================ */
+.legal {
+    --legal-offset: 84px;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 4px 48px;
+}
+
+/* ---------- Cabecera ---------- */
+.legal-cabecera {
+    text-align: center;
+    padding: 24px 0 36px;
+}
+.legal-cabecera h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    line-height: 1.1;
+    margin: 0 0 14px;
+}
+.legal-cabecera > p {
+    display: inline-block;
+    margin: 0;
+    padding-top: 14px;
+    font-size: 0.8rem;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    color: var(--muted-foreground);
+    border-top: 2px solid var(--gold);
+}
+
+/* ---------- Resumen: una sola franja con 3 compromisos ---------- */
+.legal-resumen {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 40px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+.legal-dato {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 28px 22px;
+}
+.legal-dato + .legal-dato { border-left: 1px solid var(--border); }
+.legal-dato .icono-circulo {
+    flex: none;
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--lilac-pale);
+    color: var(--primary);
+    box-shadow: 0 0 0 1px var(--gold);
+    margin-bottom: 4px;
+}
+.legal-dato h3 { font-size: 1.05rem; margin: 0; }
+.legal-dato p {
+    font-size: 0.82rem; font-weight: 300; line-height: 1.7;
+    color: var(--muted-foreground); margin: 0;
+}
+
+/* ---------- Layout: índice lateral + contenido ---------- */
+.legal-layout {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+}
+
+/* Índice (escritorio: columna fija a la izquierda) */
+.legal-botones {
+    position: sticky;
+    top: var(--legal-offset);
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border);
+}
+.legal-botones a {
+    padding: 10px 16px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    font-size: 0.85rem;
+    font-weight: 400;
+    color: var(--muted-foreground);
+    transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.legal-botones a:hover { color: var(--lilac-deep); }
+.legal-botones a[aria-current="true"] {
+    color: var(--lilac-deep);
+    font-weight: 600;
+    border-left-color: var(--gold);
+    background: var(--lilac-pale);
+}
+
+/* ---------- Contenido: una sola tarjeta con secciones separadas ---------- */
+.legal-contenido {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+.legal section {
+    scroll-margin-top: calc(var(--legal-offset) + 8px);
+    padding: clamp(24px, 5vw, 48px);
+}
+.legal section + section { border-top: 1px solid var(--border); }
+
+.legal section h2 {
+    font-size: clamp(1.5rem, 3.5vw, 1.9rem);
+    margin: 0 0 22px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--gold);
+}
+.legal section h3 {
+    font-size: 1.1rem;
+    margin: 28px 0 8px;
+    color: var(--lilac-deep);
+}
+.legal section p,
+.legal section li {
+    font-size: 0.95rem;
+    font-weight: 300;
+    line-height: 1.85;
+    color: var(--muted-foreground);
+}
+.legal section p { margin: 0 0 12px; max-width: 68ch; }
+.legal section ul { margin: 0 0 12px; padding-left: 20px; max-width: 68ch; }
+.legal section li { margin-bottom: 6px; padding-left: 4px; }
+.legal section li::marker { color: var(--gold); }
+.legal section a {
+    color: var(--lilac-deep);
+    font-weight: 600;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+}
+.legal section a:hover { text-decoration: underline; }
+
+/* ---------- Nota destacada ---------- */
+.legal-nota {
+    margin: 26px 0;
+    padding: 18px 22px;
+    background: var(--lilac-pale);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 6px 6px 0;
+}
+.legal-nota strong {
+    display: block;
+    margin-bottom: 6px;
+    font-family: 'Gilda Display', serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: var(--lilac-deep);
+}
+.legal-nota p { margin: 0; }
+
+/* ---------- Foco visible ---------- */
+.legal a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+/* ============================================================
+   TABLET Y MÓVIL
+   ============================================================ */
+@media (max-width: 860px) {
+    .legal { --legal-offset: 68px; }
+    .legal-layout { grid-template-columns: 1fr; gap: 20px; }
+
+    /* El índice pasa a barra horizontal pegada arriba */
+    .legal-botones {
+        flex-direction: row;
+        gap: 8px;
+        padding: 10px 0;
+        border-left: 0;
+        background: var(--background);
+        z-index: 5;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+    .legal-botones::-webkit-scrollbar { display: none; }
+    .legal-botones a {
+        flex: none;
+        margin: 0;
+        padding: 9px 20px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--card);
+        font-size: 0.8rem;
+        white-space: nowrap;
+    }
+    .legal-botones a[aria-current="true"] {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+    }
+}
+
+@media (max-width: 640px) {
+    .legal-cabecera { padding: 8px 0 24px; }
+
+    /* Resumen apilado: icono a la izquierda, texto a la derecha */
+    .legal-resumen { grid-template-columns: 1fr; margin-bottom: 24px; }
+    .legal-dato {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        column-gap: 16px;
+        row-gap: 2px;
+        align-items: center;
+        text-align: left;
+        padding: 18px 20px;
+    }
+    .legal-dato + .legal-dato { border-left: 0; border-top: 1px solid var(--border); }
+    .legal-dato .icono-circulo { grid-row: 1 / span 2; margin: 0; }
+    .legal-dato h3 { align-self: end; }
+    .legal-dato p { align-self: start; }
+
+    .legal-contenido { border-radius: 4px; }
+    .legal section p,
+    .legal section li { font-size: 0.92rem; line-height: 1.8; }
+    .legal-nota { padding: 16px 18px; margin: 22px 0; }
+}
+
+</style>
 <div class="legal">
 
     <header class="legal-cabecera">
         <h1>{{ "Información legal"|traducir:request }}</h1>
         <p>{{ "Última actualización"|traducir:request }}: {% now "d/m/Y" %}</p>
-
-        <nav class="legal-botones">
-            <a href="#privacidad">{{ "Privacidad"|traducir:request }}</a>
-            <a href="#terminos">{{ "Términos"|traducir:request }}</a>
-            <a href="#cookies">{{ "Cookies"|traducir:request }}</a>
-        </nav>
     </header>
 
     <div class="legal-resumen">
         <div class="legal-dato">
             <span class="icono-circulo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
             </span>
             <h3>{{ "No vendemos tus datos"|traducir:request }}</h3>
             <p>{{ "Solo los usamos para operar tu compra y tu cuenta."|traducir:request }}</p>
         </div>
         <div class="legal-dato">
             <span class="icono-circulo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
             </span>
             <h3>{{ "Pagos protegidos"|traducir:request }}</h3>
             <p>{{ "No almacenamos los datos de tu tarjeta."|traducir:request }}</p>
         </div>
         <div class="legal-dato">
             <span class="icono-circulo">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
             </span>
             <h3>{{ "Tú decides"|traducir:request }}</h3>
             <p>{{ "Pide acceso, cambios o baja de tus datos cuando quieras."|traducir:request }}</p>
         </div>
     </div>
 
-    {# ───────────── PRIVACIDAD ───────────── #}
-    <section id="privacidad">
-        <h2>{{ "Política de Privacidad"|traducir:request }}</h2>
+    <div class="legal-layout">
 
-        <p>{{ "En Bejeweled valoramos tu privacidad. Esta política explica qué datos personales recopilamos, cómo los usamos y cuáles son tus derechos."|traducir:request }}</p>
+        {# Índice: lateral en escritorio, barra horizontal pegada arriba en móvil #}
+        <nav class="legal-botones" aria-label="{{ 'Secciones'|traducir:request }}">
+            <a href="#privacidad">{{ "Privacidad"|traducir:request }}</a>
+            <a href="#terminos">{{ "Términos"|traducir:request }}</a>
+            <a href="#cookies">{{ "Cookies"|traducir:request }}</a>
+        </nav>
 
-        <h3>{{ "Responsable"|traducir:request }}</h3>
-        <p>
-            {{ "Bejeweled, con domicilio en Ciudad de México, México, es responsable del tratamiento de tus datos personales. Contáctanos en"|traducir:request }}
-            <a href="mailto:hola@bejeweled.com">hola@bejeweled.com</a>.
-        </p>
+        <div class="legal-contenido">
 
-        <h3>{{ "Datos que recopilamos"|traducir:request }}</h3>
-        <ul>
-            <li>{{ "Datos de cuenta: nombre, correo electrónico y contraseña (almacenada de forma cifrada)."|traducir:request }}</li>
-            <li>{{ "Datos de envío: dirección, ciudad, código postal y teléfono."|traducir:request }}</li>
-            <li>{{ "Datos de pedidos: productos comprados, importes, estado y referencia de pago."|traducir:request }}</li>
-            <li>{{ "Suscripción al boletín: tu correo electrónico."|traducir:request }}</li>
-            <li>{{ "Interacciones con el sitio: favoritos, carrito y reseñas."|traducir:request }}</li>
-        </ul>
+            {# ───────────── PRIVACIDAD ───────────── #}
+            <section id="privacidad">
+                <h2>{{ "Política de Privacidad"|traducir:request }}</h2>
 
-        <h3>{{ "Para qué usamos tus datos"|traducir:request }}</h3>
-        <ul>
-            <li>{{ "Crear y administrar tu cuenta."|traducir:request }}</li>
-            <li>{{ "Procesar y enviar tus pedidos, y notificarte sobre su estado."|traducir:request }}</li>
-            <li>{{ "Enviarte correos de recuperación de contraseña y confirmación de compra."|traducir:request }}</li>
-            <li>{{ "Enviarte novedades y promociones, solo si te suscribiste al boletín."|traducir:request }}</li>
-            <li>{{ "Mejorar nuestro catálogo y la experiencia en el sitio."|traducir:request }}</li>
-        </ul>
+                <p>{{ "En Bejeweled valoramos tu privacidad. Esta política explica qué datos personales recopilamos, cómo los usamos y cuáles son tus derechos."|traducir:request }}</p>
 
-        <div class="legal-nota">
-            <strong>{{ "Pagos y terceros"|traducir:request }}</strong>
-            <p>{{ "Los pagos se procesan a través de proveedores externos como PayPal; Bejeweled no almacena los datos de tu tarjeta. Solo compartimos información con proveedores necesarios para operar la tienda (pagos, correo y paquetería) o cuando la ley lo exija."|traducir:request }}</p>
+                <h3>{{ "Responsable"|traducir:request }}</h3>
+                <p>
+                    {{ "Bejeweled, con domicilio en Ciudad de México, México, es responsable del tratamiento de tus datos personales. Contáctanos en"|traducir:request }}
+                    <a href="mailto:hola@bejeweled.com">hola@bejeweled.com</a>.
+                </p>
+
+                <h3>{{ "Datos que recopilamos"|traducir:request }}</h3>
+                <ul>
+                    <li>{{ "Datos de cuenta: nombre, correo electrónico y contraseña (almacenada de forma cifrada)."|traducir:request }}</li>
+                    <li>{{ "Datos de envío: dirección, ciudad, código postal y teléfono."|traducir:request }}</li>
+                    <li>{{ "Datos de pedidos: productos comprados, importes, estado y referencia de pago."|traducir:request }}</li>
+                    <li>{{ "Suscripción al boletín: tu correo electrónico."|traducir:request }}</li>
+                    <li>{{ "Interacciones con el sitio: favoritos, carrito y reseñas."|traducir:request }}</li>
+                </ul>
+
+                <h3>{{ "Para qué usamos tus datos"|traducir:request }}</h3>
+                <ul>
+                    <li>{{ "Crear y administrar tu cuenta."|traducir:request }}</li>
+                    <li>{{ "Procesar y enviar tus pedidos, y notificarte sobre su estado."|traducir:request }}</li>
+                    <li>{{ "Enviarte correos de recuperación de contraseña y confirmación de compra."|traducir:request }}</li>
+                    <li>{{ "Enviarte novedades y promociones, solo si te suscribiste al boletín."|traducir:request }}</li>
+                    <li>{{ "Mejorar nuestro catálogo y la experiencia en el sitio."|traducir:request }}</li>
+                </ul>
+
+                <div class="legal-nota">
+                    <strong>{{ "Pagos y terceros"|traducir:request }}</strong>
+                    <p>{{ "Los pagos se procesan a través de proveedores externos como PayPal; Bejeweled no almacena los datos de tu tarjeta. Solo compartimos información con proveedores necesarios para operar la tienda (pagos, correo y paquetería) o cuando la ley lo exija."|traducir:request }}</p>
+                </div>
+
+                <h3>{{ "Tus derechos"|traducir:request }}</h3>
+                <p>
+                    {{ "Puedes solicitar el acceso, rectificación, cancelación u oposición al tratamiento de tus datos (derechos ARCO), o darte de baja del boletín, escribiendo a"|traducir:request }}
+                    <a href="mailto:hola@bejeweled.com">hola@bejeweled.com</a>.
+                </p>
+            </section>
+
+            {# ───────────── TÉRMINOS ───────────── #}
+            <section id="terminos">
+                <h2>{{ "Términos y Condiciones"|traducir:request }}</h2>
+
+                <p>{{ "Al usar este sitio y realizar compras en Bejeweled aceptas los siguientes términos."|traducir:request }}</p>
+
+                <h3>{{ "Cuenta de usuario"|traducir:request }}</h3>
+                <p>{{ "Eres responsable de la veracidad de tus datos y de mantener la confidencialidad de tu contraseña. Debes ser mayor de edad para realizar compras."|traducir:request }}</p>
+
+                <h3>{{ "Productos y precios"|traducir:request }}</h3>
+                <p>{{ "Las imágenes son ilustrativas y pueden existir ligeras variaciones de color o acabado en piezas elaboradas con materiales naturales. Los precios pueden cambiar sin previo aviso; el precio aplicable es el vigente al confirmar tu pedido."|traducir:request }}</p>
+
+                <h3>{{ "Pedidos y pagos"|traducir:request }}</h3>
+                <p>{{ "Un pedido queda confirmado cuando se acredita el pago. Nos reservamos el derecho de cancelar pedidos por falta de existencias, errores evidentes de precio o sospecha de fraude, reembolsando el importe pagado."|traducir:request }}</p>
+
+                <h3>{{ "Envíos"|traducir:request }}</h3>
+                <p>{{ "Los tiempos de entrega son estimados y pueden variar según la paquetería y tu ubicación. Es responsabilidad del cliente proporcionar una dirección correcta y completa."|traducir:request }}</p>
+
+                <div class="legal-nota">
+                    <strong>{{ "Cambios y devoluciones"|traducir:request }}</strong>
+                    <p>
+                        {{ "Si tu pieza llega dañada o no corresponde a tu pedido, contáctanos dentro de los primeros días posteriores a la entrega en"|traducir:request }}
+                        <a href="mailto:hola@bejeweled.com">hola@bejeweled.com</a>
+                        {{ "para gestionar un cambio o reembolso. La pieza debe conservar su estado original."|traducir:request }}
+                    </p>
+                </div>
+
+                <h3>{{ "Propiedad intelectual"|traducir:request }}</h3>
+                <p>{{ "El contenido del sitio (logotipos, textos, imágenes y diseños) pertenece a Bejeweled y no puede usarse sin autorización previa."|traducir:request }}</p>
+
+                <h3>{{ "Legislación aplicable"|traducir:request }}</h3>
+                <p>{{ "Estos términos se rigen por las leyes de los Estados Unidos Mexicanos."|traducir:request }}</p>
+            </section>
+
+            {# ───────────── COOKIES ───────────── #}
+            <section id="cookies">
+                <h2>{{ "Política de Cookies"|traducir:request }}</h2>
+
+                <p>{{ "Las cookies son pequeños archivos que se guardan en tu navegador para que el sitio funcione correctamente y recuerde tus preferencias."|traducir:request }}</p>
+
+                <h3>{{ "Cookies que utilizamos"|traducir:request }}</h3>
+                <ul>
+                    <li>{{ "Esenciales: mantienen tu sesión iniciada y protegen los formularios (seguridad)."|traducir:request }}</li>
+                    <li>{{ "Funcionales: recuerdan tu carrito y tu idioma preferido."|traducir:request }}</li>
+                </ul>
+
+                <div class="legal-nota">
+                    <strong>{{ "Cómo desactivarlas"|traducir:request }}</strong>
+                    <p>{{ "Puedes bloquear o eliminar las cookies desde la configuración de tu navegador. Si lo haces, algunas funciones, como el carrito o el inicio de sesión, podrían dejar de funcionar."|traducir:request }}</p>
+                </div>
+            </section>
+
         </div>
-
-        <h3>{{ "Tus derechos"|traducir:request }}</h3>
-        <p>
-            {{ "Puedes solicitar el acceso, rectificación, cancelación u oposición al tratamiento de tus datos (derechos ARCO), o darte de baja del boletín, escribiendo a"|traducir:request }}
-            <a href="mailto:hola@bejeweled.com">hola@bejeweled.com</a>.
-        </p>
-    </section>
-
-    {# ───────────── TÉRMINOS ───────────── #}
-    <section id="terminos">
-        <h2>{{ "Términos y Condiciones"|traducir:request }}</h2>
-
-        <p>{{ "Al usar este sitio y realizar compras en Bejeweled aceptas los siguientes términos."|traducir:request }}</p>
-
-        <h3>{{ "Cuenta de usuario"|traducir:request }}</h3>
-        <p>{{ "Eres responsable de la veracidad de tus datos y de mantener la confidencialidad de tu contraseña. Debes ser mayor de edad para realizar compras."|traducir:request }}</p>
-
-        <h3>{{ "Productos y precios"|traducir:request }}</h3>
-        <p>{{ "Las imágenes son ilustrativas y pueden existir ligeras variaciones de color o acabado en piezas elaboradas con materiales naturales. Los precios pueden cambiar sin previo aviso; el precio aplicable es el vigente al confirmar tu pedido."|traducir:request }}</p>
-
-        <h3>{{ "Pedidos y pagos"|traducir:request }}</h3>
-        <p>{{ "Un pedido queda confirmado cuando se acredita el pago. Nos reservamos el derecho de cancelar pedidos por falta de existencias, errores evidentes de precio o sospecha de fraude, reembolsando el importe pagado."|traducir:request }}</p>
-
-        <h3>{{ "Envíos"|traducir:request }}</h3>
-        <p>{{ "Los tiempos de entrega son estimados y pueden variar según la paquetería y tu ubicación. Es responsabilidad del cliente proporcionar una dirección correcta y completa."|traducir:request }}</p>
-
-        <div class="legal-nota">
-            <strong>{{ "Cambios y devoluciones"|traducir:request }}</strong>
-            <p>
-                {{ "Si tu pieza llega dañada o no corresponde a tu pedido, contáctanos dentro de los primeros días posteriores a la entrega en"|traducir:request }}
-                <a href="mailto:hola@bejeweled.com">hola@bejeweled.com</a>
-                {{ "para gestionar un cambio o reembolso. La pieza debe conservar su estado original."|traducir:request }}
-            </p>
-        </div>
-
-        <h3>{{ "Propiedad intelectual"|traducir:request }}</h3>
-        <p>{{ "El contenido del sitio (logotipos, textos, imágenes y diseños) pertenece a Bejeweled y no puede usarse sin autorización previa."|traducir:request }}</p>
-
-        <h3>{{ "Legislación aplicable"|traducir:request }}</h3>
-        <p>{{ "Estos términos se rigen por las leyes de los Estados Unidos Mexicanos."|traducir:request }}</p>
-    </section>
-
-    {# ───────────── COOKIES ───────────── #}
-    <section id="cookies">
-        <h2>{{ "Política de Cookies"|traducir:request }}</h2>
-
-        <p>{{ "Las cookies son pequeños archivos que se guardan en tu navegador para que el sitio funcione correctamente y recuerde tus preferencias."|traducir:request }}</p>
-
-        <h3>{{ "Cookies que utilizamos"|traducir:request }}</h3>
-        <ul>
-            <li>{{ "Esenciales: mantienen tu sesión iniciada y protegen los formularios (seguridad)."|traducir:request }}</li>
-            <li>{{ "Funcionales: recuerdan tu carrito y tu idioma preferido."|traducir:request }}</li>
-        </ul>
-
-        <div class="legal-nota">
-            <strong>{{ "Cómo desactivarlas"|traducir:request }}</strong>
-            <p>{{ "Puedes bloquear o eliminar las cookies desde la configuración de tu navegador. Si lo haces, algunas funciones, como el carrito o el inicio de sesión, podrían dejar de funcionar."|traducir:request }}</p>
-        </div>
-    </section>
-
+    </div>
 </div>
+
+<script>
+/* Resalta en el índice la sección que se está leyendo */
+(function () {
+    var nav = document.querySelector('.legal-botones');
+    if (!nav || !('IntersectionObserver' in window)) return;
+    var links = nav.querySelectorAll('a');
+    var map = {};
+    links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+
+    function activar(id) {
+        links.forEach(function (a) { a.removeAttribute('aria-current'); });
+        var a = map[id];
+        if (!a) return;
+        a.setAttribute('aria-current', 'true');
+        /* En móvil, centra el botón activo dentro de la barra horizontal */
+        if (nav.scrollWidth > nav.clientWidth) {
+            nav.scrollTo({ left: a.offsetLeft - (nav.clientWidth - a.offsetWidth) / 2, behavior: 'smooth' });
+        }
+    }
+
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { if (e.isIntersecting) activar(e.target.id); });
+    }, { rootMargin: '-20% 0px -65% 0px' });
+
+    document.querySelectorAll('.legal section[id]').forEach(function (s) { io.observe(s); });
+    activar('privacidad');
+})();
+</script>
 {% endblock %}

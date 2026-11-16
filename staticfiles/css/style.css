@@ -985,315 +985,102 @@ form ul.errorlist { color: var(--danger); }
     }
     .burbuja-chat { right: 16px; bottom: 16px; }
 }
-
-
-/* ============================================================
-   PÁGINA LEGAL (privacidad, términos, cookies)
-   ============================================================ */
-html { scroll-behavior: smooth; }
-
-.legal { max-width: 860px; margin: 0 auto; }
-
-/* Cabecera con botones */
-.legal-cabecera { text-align: center; margin-bottom: 40px; }
-.legal-cabecera h1 { font-size: 2.2rem; margin: 0 0 8px; }
-.legal-cabecera > p {
-    font-size: 0.8rem; font-weight: 300;
-    letter-spacing: 0.06em; margin: 0 0 28px;
-    color: var(--muted-foreground);
-}
-.legal-botones { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
-.legal-botones a {
-    padding: 11px 28px;
-    font-size: 0.72rem; font-weight: 600;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--lilac-deep);
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-.legal-botones a:hover {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
+.chat-productos {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 8px 0 12px;
+    width: 100%;
 }
 
-/* Tarjetas de resumen */
-.legal-resumen {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 16px; margin-bottom: 40px;
-}
-.legal-dato {
-    display: flex; flex-direction: column; align-items: center; text-align: center;
-    gap: 10px; padding: 28px 20px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    transition: background 0.25s;
-}
-.legal-dato:hover { background: var(--lilac-pale); }
-.legal-dato .icono-circulo {
-    width: 48px; height: 48px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--muted); color: var(--primary);
-}
-.legal-dato h3 { font-size: 1rem; margin: 0; }
-.legal-dato p {
-    font-size: 0.8rem; font-weight: 300; line-height: 1.7;
-    color: var(--muted-foreground); margin: 0;
+.chat-producto {
+    background: #fff;
+    border: 1px solid #e7e1d8;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-/* Secciones como tarjetas */
-.legal section {
-    scroll-margin-top: 90px;
-    margin-bottom: 28px; padding: 40px;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-}
-.legal section h2 {
-    font-size: 1.7rem; margin: 0 0 20px; padding-bottom: 14px;
-    border-bottom: 2px solid var(--gold);
-}
-.legal section h3 { font-size: 1.1rem; margin: 26px 0 8px; color: var(--lilac-deep); }
-.legal section p, .legal section li {
-    font-size: 0.9rem; font-weight: 300; line-height: 1.9;
-    color: var(--muted-foreground);
-}
-.legal section p { margin: 0 0 12px; }
-.legal section ul { margin: 0 0 12px; padding-left: 20px; }
-.legal section li::marker { color: var(--gold); }
-.legal section a { color: var(--lilac-deep); font-weight: 600; }
-.legal section a:hover { text-decoration: underline; }
-
-/* Recuadro de nota */
-.legal-nota {
-    margin: 24px 0;
-    padding: 18px 22px;
-    background: var(--lilac-pale);
-    border-left: 3px solid var(--gold);
-    border-radius: 2px;
-}
-.legal-nota strong {
-    display: block; margin-bottom: 6px;
-    font-family: 'Gilda Display', serif; font-weight: 400;
-    font-size: 1rem; color: var(--lilac-deep);
-}
-.legal-nota p { margin: 0; }
-
-@media (max-width: 600px) {
-    .legal-cabecera h1 { font-size: 1.8rem; }
-    .legal section { padding: 24px; }
+.chat-producto-imagen {
+    display: block;
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
 }
 
-/* ============================================================
-   AJUSTES PARA CELULAR
-   Evitan bordes y franjas blancas en pantallas pequeñas.
-   Van al FINAL del archivo para sobrescribir sin tocar lo anterior.
-   ============================================================ */
-
-/* 1) Nada debe ensanchar la página: quita la franja blanca lateral */
-html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
-html, body { max-width: 100%; }
-body { overflow-x: hidden; }
-@supports (overflow: clip) { body { overflow-x: clip; } }
-
-/* 2) El footer siempre queda al fondo: sin franja blanca debajo en páginas cortas */
-body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
-body > * { width: 100%; min-width: 0; }
-.site-footer { margin-top: auto; }
-
-/* 3) Sin recuadro gris/blanco al tocar enlaces y botones; sin zoom por doble toque */
-a, button, label, input, select, textarea, .btn {
-    -webkit-tap-highlight-color: transparent;
-}
-a, button, .btn { touch-action: manipulation; }
-
-/* 4) Safari: el desenfoque del header y las líneas finas en tarjetas con bordes redondeados */
-.site-header { -webkit-backdrop-filter: blur(10px); }
-.tarjeta-categoria, .tarjeta-coleccion, .tarjeta-producto .imagen {
-    isolation: isolate;
-    transform: translateZ(0);
+.chat-producto-sin-imagen {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f5f1eb;
+    color: #888;
+    font-size: 13px;
 }
 
-/* 5) Rejillas que nunca superan el ancho de la pantalla (celulares de 320 a 360 px) */
-.grid-categorias { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
-.grid-colecciones { grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
-.grid-beneficios { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
-.grid-tarjetas { grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr)); }
-.legal-resumen { grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); }
-
-.layout-catalogo > *, .layout-carrito > *, .layout-checkout > *, .detalle-producto > * {
-    min-width: 0;
+.chat-producto-info {
+    padding: 12px;
 }
 
-/* 6) Textos largos (correos, palabras sin espacios) no empujan el ancho */
-.legal section, .descripcion-producto, .resena p, .tarjeta-direccion,
-.aviso, .mensaje, .panel { overflow-wrap: anywhere; }
-
-/* 7) Pantallas sin cursor (celulares y tabletas): sin efectos de hover que se quedan pegados */
-@media (hover: none) {
-    .btn:hover,
-    .tarjeta-producto:hover { transform: none; }
-    .tarjeta-producto:hover .imagen img,
-    .tarjeta-categoria:hover img,
-    .tarjeta-coleccion:hover img { transform: none; }
+.chat-producto-info h4 {
+    margin: 0 0 5px;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-/* ---------- Tabletas y celulares grandes ---------- */
-@media (max-width: 1024px) {
-    .layout-catalogo, .layout-carrito, .layout-checkout {
-        grid-template-columns: minmax(0, 1fr);
-    }
+.chat-producto-precio {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 700;
 }
 
-/* ---------- Celulares ---------- */
-@media (max-width: 680px) {
-    /* Solo los lados: el atajo 'padding: 0 16px' borraba el espacio de arriba y abajo de .seccion */
-    .contenedor, .contenedor-angosto { padding-left: 16px; padding-right: 16px; }
-
-    /* Encabezado: que logo, carrito y menú quepan en una sola fila */
-    .header-inner { gap: 10px; height: 60px; }
-    .logo-texto { font-size: 1.2rem; letter-spacing: 0.12em; }
-    .header-acciones { gap: 6px; }
-    .menu-usuario > span {
-        display: inline-block; max-width: 84px;
-        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        vertical-align: middle;
-    }
-    .nav-movil { padding: 16px; }
-
-    /* Inicio */
-    .hero { min-height: 80vh; min-height: 80svh; }
-    .hero-contenido { padding: 72px 0; }
-    .hero-botones .btn { width: 100%; }
-    .seccion-titulo { margin-bottom: 36px; }
-    .seccion-eyebrow .linea { width: 32px; }
-    .seccion-eyebrow span { letter-spacing: 0.2em; }
-    .gold-divider.estrecho { margin: 0 24px; }
-    .banda-garantias span { font-size: 0.6rem; letter-spacing: 0.14em; }
-    .seccion-ia { padding: 64px 0; }
-    .seccion-newsletter { padding: 56px 0; }
-
-    /* Categorías en dos columnas, colecciones y beneficios en una */
-    .grid-categorias { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .tarjeta-categoria .info { padding: 14px; }
-    .tarjeta-categoria .info h3 { font-size: 1rem; }
-    .grid-colecciones { grid-template-columns: minmax(0, 1fr); }
-    .tarjeta-coleccion { min-height: 300px; }
-    .tarjeta-coleccion .info { padding: 20px; }
-    .grid-beneficios { grid-template-columns: minmax(0, 1fr); }
-    .beneficio { padding: 28px 20px; }
-
-    /* Catálogo: dos productos por fila en cualquier celular */
-    .grid-productos { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .tarjeta-producto .info { padding: 12px; }
-    .tarjeta-producto .info h3 { font-size: 0.92rem; }
-    .tarjeta-producto .pie { flex-wrap: wrap; gap: 6px; }
-    .precio { font-size: 0.92rem; }
-    .filtros { padding: 18px; }
-    .barra-resultados { font-size: 0.78rem; }
-
-    /* Detalle de producto */
-    .detalle-producto { grid-template-columns: minmax(0, 1fr); gap: 28px; margin-top: 24px; }
-    .info-producto h1 { font-size: 1.7rem; }
-    .form-agregar { flex-wrap: wrap; }
-    .form-agregar .btn { flex: 1 1 100%; }
-    .rango-precio { flex-wrap: wrap; }
-
-    /* Newsletter apilado */
-    .form-newsletter { flex-direction: column; gap: 10px; }
-    .form-newsletter input {
-        border: 1px solid var(--border); border-radius: 2px; text-align: center;
-    }
-    .form-newsletter button { width: 100%; border-radius: 2px; }
-
-    /* Cuenta, carrito y pago */
-    .panel { padding: 20px; }
-    .panel-angosto { margin: 28px auto; }
-    .layout-carrito, .layout-checkout { gap: 24px; }
-    .resumen-lateral { padding: 22px; }
-    .pasos-checkout { flex-wrap: wrap; gap: 8px; letter-spacing: 0.08em; }
-    .opcion-direccion { padding: 14px; }
-    .tabla .celda-producto { align-items: flex-start; }
-
-    /* Footer */
-    .footer-grid { padding: 48px 0 32px; gap: 32px; }
-    .footer-barra { flex-direction: column; align-items: flex-start; }
-    .footer-barra .legales { flex-wrap: wrap; gap: 8px 20px; }
-
-    /* Chat: usa la altura visible real (la barra del navegador no lo tapa) */
-    .panel-chat {
-        height: calc(100vh - 24px);
-        height: calc(100dvh - 24px);
-        bottom: calc(12px + env(safe-area-inset-bottom));
-    }
-    .burbuja-chat {
-        bottom: calc(16px + env(safe-area-inset-bottom));
-        right: calc(16px + env(safe-area-inset-right));
-    }
-
-    /* iPhone: con letra menor a 16 px, Safari hace zoom al tocar un campo y deja bordes blancos */
-    html body input:not([type="checkbox"]):not([type="radio"]),
-    html body select,
-    html body textarea { font-size: 16px; }
+.chat-producto-material {
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: #777;
 }
 
-/* ---------- Celulares muy angostos (320 px) ---------- */
-@media (max-width: 380px) {
-    .logo-texto { font-size: 1.05rem; letter-spacing: 0.08em; }
-    .logo-marca { width: 28px; height: 28px; }
-    .hero h1 { font-size: 2rem; }
-    .tarjeta-producto .info h3 { font-size: 0.85rem; }
-    .btn { padding: 13px 20px; }
-    .footer-grid { gap: 28px; }
+.chat-producto-agotado {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-size: 11px;
+    color: #a33;
 }
 
-
-/* ============================================================
-   HEADER EN CELULAR
-   En pantallas angostas solo caben: logo, carrito y botón de menú.
-   Lo demás (buscar, favoritos, cuenta) vive en el menú móvil.
-   ============================================================ */
-
-/* El header nunca debe ser más ancho que la pantalla */
-.header-inner { min-width: 0; }
-.logo { min-width: 0; }
-.logo-texto { white-space: nowrap; }
-.header-acciones { flex-shrink: 0; }
-
-/* El selector de idioma del menú móvil estaba oculto por la regla de 1024 px */
-.nav-movil .selector-idioma { display: flex; }
-.nav-movil form { margin: 0; }
-
-/* Botón "Cerrar sesión" con el mismo aspecto que los enlaces del menú móvil */
-.nav-movil .link-boton {
-    display: block; width: 100%; text-align: left; padding: 0;
-    font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase;
-    text-decoration: none; color: var(--foreground);
+.chat-producto-boton {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    border-radius: 8px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    background: #c9a84c;
+    color: #fff;
+    transition: opacity 0.2s ease;
 }
 
-@media (max-width: 680px) {
-    /* Oculta buscar, favoritos, cuenta e inicio de sesión del header.
-       Funciona con el header.html viejo y con el nuevo (no depende de la clase). */
-    .solo-escritorio,
-    #btn-buscar,
-    #caja-buscar,
-    .header-acciones > .icono-btn:not(.carrito-btn):not(.menu-movil-btn),
-    .header-acciones > .menu-usuario { display: none !important; }
+.chat-producto-boton:hover {
+    opacity: 0.85;
+}
 
-    .header-inner { gap: 8px; flex-wrap: nowrap; }
-    .header-acciones { gap: 4px; }
-    .icono-btn { padding: 5px; }
+/* Descripción en el detalle del producto */
+.descripcion-producto {
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+}
 
-    /* El logo se encoge en vez de empujar los botones fuera de la pantalla */
-    .logo { flex: 0 1 auto; min-width: 0; gap: 8px; }
-    .logo-marca { width: 30px; height: 30px; flex-shrink: 0; }
-    .logo-texto { font-size: 1.1rem; letter-spacing: 0.1em; min-width: 0; overflow: hidden; }
-
-    /* Nada dentro del header puede ensanchar la página (iPhone la encogería con zoom) */
-    .site-header { overflow-x: hidden; }
-    @supports (overflow: clip) { .site-header { overflow-x: clip; } }
+/* Texto de presentación arriba de los productos (colección o categoría) */
+.seccion-titulo p {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: justify;
+    text-align-last: center;   /* la última línea queda centrada, como el título */
+    text-justify: inter-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
 }
